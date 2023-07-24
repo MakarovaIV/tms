@@ -1,0 +1,37 @@
+{% extends 'root.html' %}
+
+{% block content %}
+<style>
+    .invisible {
+        display:none
+    }
+
+	.proj-wrapper {
+		display: flex;
+		flex-direction: column;
+		align-items: start;
+		flex-grow: 1;
+	}
+</style>
+	<div class="proj-wrapper">
+		{% if user.is_authenticated %}
+			<h3>Create new project</h3>
+			<form action="{% url 'project_create' %}" method="post">
+
+			{% csrf_token %}
+				<input name="user_id" value="{{ user_id }}" class="invisible"/>
+				<p>
+					<label for="ProjName">Project name</label>
+					<input name="name" id="ProjName" value="{{ name }}"/>
+				</p>
+				<p>
+					<label for="Desc">Description</label>
+					<textarea name="desc" id="Desc">{{ desc }}</textarea>
+				</p>
+				<button class="btn btn-success" type="submit">Create</button>
+			</form>
+		{% else %}
+			<p>You are not authorized</p>
+		{% endif %}
+	</div>
+{% endblock %}

@@ -2,7 +2,7 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 from django.forms import PasswordInput, EmailInput
 
-from .models import CustomUser
+from .models import CustomUser, Project
 
 
 class CustomUserCreationForm(UserCreationForm):
@@ -39,3 +39,13 @@ class SignUpForm(UserCreationForm):
         if user_email.exists():
             raise forms.ValidationError("Email is existed")
         return email
+
+
+class ProjectCreateForm(forms.ModelForm):
+    name = forms.CharField(max_length=100)
+    desc = forms.CharField(widget=forms.Textarea)
+    user_id = forms.IntegerField(required=False)
+
+    class Meta:
+        model = Project
+        fields = ['name', 'desc', 'user_id']

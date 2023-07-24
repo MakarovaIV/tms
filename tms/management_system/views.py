@@ -8,14 +8,10 @@ from django.contrib.auth.forms import AuthenticationForm
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
-from django.views.generic import ListView
+from django.views.generic import ListView, CreateView
 
-from .forms import SignUpForm
-from .models import CustomUser
-
-
-class IndexView(ListView):
-    pass
+from .forms import SignUpForm, ProjectCreateForm
+from .models import CustomUser, Project
 
 
 def register(request):
@@ -75,3 +71,26 @@ def get_user_image(request, pk):
         extension = matches.group(1) if matches else "jpeg"
         content_type = "image/" + extension
         return HttpResponse(picture_data, content_type=content_type)
+
+
+class ProjectView(ListView):
+    model = Project
+    template_name = 'management_system/projects/project_list.html'
+    context_object_name = 'projects'
+
+
+class ProjectCreateView(CreateView):
+    model = Project
+    form_class = ProjectCreateForm
+    template_name = 'management_system/projects/project_form.html'
+    success_url = reverse_lazy('projects')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["user_id"] = self.request.user.id
+        return context
+
+    def form_valid(self, form):
+        form.instance.user = self.request.user
+        form.save()
+        return super(ProjectCreateView, self).form_valid(form)
