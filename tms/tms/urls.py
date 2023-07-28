@@ -22,9 +22,12 @@ from management_system import views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.ProjectView.as_view(), name="index"),
-    path('projects/', views.ProjectView.as_view(), name="projects"),
     path('signup/', views.register, name="signup"),
     path('login/', views.login_handler, name="login"),
     path('logout/', views.logout_handler, name="logout"),
+    path('projects/', views.ProjectView.as_view(), name="projects"),
     path('project/create/', views.ProjectCreateView.as_view(), name='project_create'),
+    path('projects/<int:pk>/', views.TestCaseView.as_view(), name="test_cases"),
+    path('projects/<int:proj_id>/tc_create/', views.TestCaseCreateView.as_view(), name="tc_create"),
+    path('projects/<int:proj_id>/tc/<int:pk>', views.TestCaseUpdate.as_view(), name="tc_update"),
 ]

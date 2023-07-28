@@ -1,7 +1,8 @@
 {% extends 'root.html' %}
 
+
 {% block title %}
-    Main
+    TC
 {% endblock %}
 
 {% block content %}
@@ -39,17 +40,38 @@
 			margin-left: 1rem;
 			margin-bottom: 1rem;
 		}
+
+		.tag {
+			border-radius: 4px;
+			background-color: lightblue;
+			padding: 0.25rem 0.5rem;
+			text-decoration: none;
+		}
+
+		.btn-back {
+			position: fixed;
+			margin-left: 1rem;
+			margin-bottom: 1rem;
+		}
 	</style>
+
+	<div class="btn-back">
+		<a href="{% url 'projects' %}" class="btn btn-secondary">
+			Back in {{ proj_name }}
+		</a>
+	</div>
     <div class="main">
-		{% for project in projects %}
+		{% for tc in test_cases %}
 			<div class="proj-div">
 				<div class="proj-body">
-					<a href="{% url 'test_cases' project.pk %}" class="card-title">{{project.name}}</a>
-					<span>{{project.desc}}</span>
+					<a href="{% url 'tc_update' proj_id=proj_id pk=tc.pk %}" class="card-title">{{ tc.name }}</a>
+					<span>{{ tc.desc }}</span>
 				</div>
 				<div>
-					<p>{{project.user.username}}</p>
-					<p>{{project.creation_date}}</p>
+					<p>{{ tc.user.username }}</p>
+					<p>{{ tc.creation_date }}</p>
+					<p>{{ tc.modification_date }}</p>
+					<p class="tag" >{{ tc.status }}</p>
 				</div>
 			</div>
 		{% endfor %}
@@ -98,8 +120,8 @@
 {% endblock %}
 {% block footer %}
 	<div>
-		<a href="{% url 'project_create' %}" class="btn btn-secondary">
-			New project
+		<a href="{% url 'tc_create' proj_id=proj_id %}" class="btn btn-secondary">
+			New test-case
 		</a>
 	</div>
 

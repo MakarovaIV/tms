@@ -2,7 +2,13 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 from django.forms import PasswordInput, EmailInput
 
-from .models import CustomUser, Project
+from .models import CustomUser, Project, TC
+
+TC_STATUS = [
+    ("ACTIVE", "ACTIVE"),
+    ("DRAFT", "DRAFT"),
+    ("OUTDATED", "OUTDATED"),
+]
 
 
 class CustomUserCreationForm(UserCreationForm):
@@ -48,4 +54,24 @@ class ProjectCreateForm(forms.ModelForm):
 
     class Meta:
         model = Project
-        fields = ['name', 'desc', 'user_id']
+        fields = ['name',
+                  'desc',
+                  'user_id']
+
+
+class TestCaseCreateForm(forms.ModelForm):
+    name = forms.CharField(max_length=200)
+    desc = forms.CharField(widget=forms.Textarea)
+    user_id = forms.IntegerField(required=False)
+    proj_id = forms.IntegerField(required=False)
+    status = forms.ChoiceField(choices=TC_STATUS)
+    steps = forms.JSONField(required=False)
+
+    class Meta:
+        model = TC
+        fields = ['name',
+                  'desc',
+                  'user_id',
+                  'proj_id',
+                  'status',
+                  'steps']
