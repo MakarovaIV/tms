@@ -62,7 +62,8 @@ class ProjectCreateForm(forms.ModelForm):
 class TestCaseCreateForm(forms.ModelForm):
     name = forms.CharField(max_length=200)
     desc = forms.CharField(widget=forms.Textarea)
-    user_id = forms.IntegerField(required=False)
+    creator_id = forms.IntegerField(required=False)
+    modified_by_id = forms.IntegerField(required=False)
     proj_id = forms.IntegerField(required=False)
     status = forms.ChoiceField(choices=TC_STATUS)
     steps = forms.JSONField(required=False)
@@ -71,7 +72,8 @@ class TestCaseCreateForm(forms.ModelForm):
         model = TC
         fields = ['name',
                   'desc',
-                  'user_id',
+                  'creator_id',
+                  'modified_by_id',
                   'proj_id',
                   'status',
                   'steps']

@@ -27,7 +27,9 @@ urlpatterns = [
     path('logout/', views.logout_handler, name="logout"),
     path('projects/', views.ProjectView.as_view(), name="projects"),
     path('project/create/', views.ProjectCreateView.as_view(), name='project_create'),
+    path('project/delete/<int:pk>/', views.ProjectDeleteView.as_view(), name='project_del'),
     path('projects/<int:pk>/', views.TestCaseView.as_view(), name="test_cases"),
     path('projects/<int:proj_id>/tc_create/', views.TestCaseCreateView.as_view(), name="tc_create"),
     path('projects/<int:proj_id>/tc/<int:pk>', views.TestCaseUpdate.as_view(), name="tc_update"),
+    path('projects/<int:proj_id>/tc/delete/<int:pk>', views.TestCaseDelete.as_view(), name="tc_delete"),
 ]

@@ -58,23 +58,64 @@
 		});
 	};
 
-	var addStep = function() {
+	var addStep = function(name, value, beforeTarget) {
 		var step = document.createElement("div");
 		step.classList.add("step");
-		stepsWrapper.appendChild(step);
+		stepsWrapper.insertBefore(step, beforeTarget || null);
 
 		var label = document.createElement("p");
 		label.classList.add("step_number");
 
 		var stepName = document.createElement("textarea");
 		stepName.name = "step_name";
+		if (name != null) {
+			stepName.innerText = name;
+		}
 
 		var stepValue = document.createElement("textarea");
 		stepValue.name = "step_value";
+		if (value != null) {
+			stepValue.innerText = value;
+		}
+
+		var delBtn = document.createElement("button");
+		delBtn.type = "button";
+		delBtn.onclick= delStep;
+		delBtn.classList.add("btn", "btn-danger");
+		delBtn.innerText = "Delete step";
+
+		var copyBtn = document.createElement("button");
+		copyBtn.type = "button";
+		copyBtn.onclick= copyStep;
+		copyBtn.classList.add("btn", "btn-secondary");
+		copyBtn.innerText = "Copy step";
 
 		step.appendChild(label);
 		step.appendChild(stepName);
 		step.appendChild(stepValue);
+		step.appendChild(delBtn);
+		step.appendChild(copyBtn);
+
+		updateIndexes();
+	};
+
+	var delStep = function(event) {
+		var me = event.target;
+		var steps = document.querySelectorAll(".step");
+		var step = Array.from(steps).find(item => item.dataset.index == me.dataset.index);
+		step && step.remove();
+
+		updateIndexes();
+	};
+
+	var copyStep = function(event) {
+		var me = event.target;
+		var steps = document.querySelectorAll(".step");
+		var step = Array.from(steps).find(item => item.dataset.index == me.dataset.index);
+		var stepName = step.children.step_name.value;
+		var stepValue = step.children.step_value.value;
+
+		addStep(stepName, stepValue, step);
 
 		updateIndexes();
 	};
@@ -101,6 +142,24 @@
 					<label for="TCName">Test-case name</label>
 					<input name="name" id="TCName" value="{{ name }}"/>
 				</p>
+
+
+
+				{% if tc and tc.pk %}
+					<p>
+						<label>Created by: {{ tc.user.username }}</label>
+					</p>
+					<p>
+						<label>Modified by: {{ modified_by.username }}</label>
+					</p>
+					<p>
+						<label>Creation date: {{ tc.creation_date }}</label>
+					</p>
+					<p>
+						<label>Modification date: {{ tc.modification_date }}</label>
+					</p>
+				{% endif %}
+
 				<p>
 					<label for="Desc">Description</label>
 					<textarea name="desc" id="Desc">{{ desc }}</textarea>
@@ -112,6 +171,8 @@
 							<p class="step_number">{{ step.index }}</p>
 							<textarea name="step_name" data-index="{{ step.index }}">{{ step.step_name }}</textarea>
 							<textarea name="step_value" data-index="{{ step.index }}">{{ step.step_value }}</textarea>
+							<button class="btn btn-danger" onclick="delStep(event)" type="button" data-index="{{ step.index }}">Delete step</button>
+							<button class="btn btn-secondary" onclick="copyStep(event)" type="button" data-index="{{ step.index }}">Copy step</button>
 						</div>
 					{% endfor %}
 				</div>

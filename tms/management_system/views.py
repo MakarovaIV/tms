@@ -8,7 +8,7 @@ from django.contrib.auth.forms import AuthenticationForm
 from django.http import HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy
-from django.views.generic import ListView, CreateView, DetailView, UpdateView
+from django.views.generic import ListView, CreateView, DetailView, UpdateView, DeleteView
 
 from .forms import SignUpForm, ProjectCreateForm, TestCaseCreateForm
 from .models import CustomUser, Project, TC
@@ -96,6 +96,12 @@ class ProjectCreateView(CreateView):
         return super(ProjectCreateView, self).form_valid(form)
 
 
+class ProjectDeleteView(DeleteView):
+    model = Project
+    template_name = 'management_system/projects/project_form_delete.html'
+    success_url = reverse_lazy('projects')
+
+
 class TestCaseView(ListView):
     model = TC
     template_name = 'management_system/test_cases/test_cases_list.html'
@@ -124,14 +130,15 @@ class TestCaseCreateView(CreateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["user_id"] = self.request.user.id
+        context["creator_id"] = self.request.user.id
         context["proj_id"] = get_object_or_404(Project, id=self.kwargs['proj_id']).id
         context["steps"] = [{"index": 0, "step_name": "Step name", "step_value": "Expected result"}]
         return context
 
     def form_valid(self, form):
         form.instance.user = self.request.user
-        project = get_object_or_404(Project, id=self.kwargs['pk'])
+        form.instance.modified_by = self.request.user.id
+        project = get_object_or_404(Project, id=self.kwargs['proj_id'])
         form.instance.proj = project
         form.save()
         return super(TestCaseCreateView, self).form_valid(form)
@@ -154,10 +161,31 @@ class TestCaseUpdate(UpdateView):
         context["user_id"] = self.request.user.id
         context["proj_id"] = get_object_or_404(Project, id=self.kwargs['proj_id']).id
         tc = get_object_or_404(TC, id=self.kwargs['pk'])
+        modified_by_id = get_object_or_404(CustomUser, id=tc.modified_by)
         context["name"] = tc.name
         context["desc"] = tc.desc
         context["steps"] = tc.steps
         context["status"] = tc.status
-
+        context["modified_by"] = modified_by_id
         return context
 
+    def form_valid(self, form):
+        form.instance.modified_by = self.request.user.id
+        project = get_object_or_404(Project, id=self.kwargs['proj_id'])
+        form.instance.proj = project
+        form.save()
+        return super(TestCaseUpdate, self).form_valid(form)
+
+
+class TestCaseDelete(DeleteView):
+    model = TC
+    template_name = 'management_system/test_cases/test_cases_form_delete.html'
+
+    def get_success_url(self):
+        return reverse_lazy('test_cases', kwargs={'pk': self.kwargs['proj_id']})
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["user_id"] = self.request.user.id
+        context["proj_id"] = get_object_or_404(Project, id=self.kwargs['proj_id']).id
+        return context

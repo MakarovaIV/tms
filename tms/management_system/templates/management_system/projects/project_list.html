@@ -51,6 +51,11 @@
 					<p>{{project.user.username}}</p>
 					<p>{{project.creation_date}}</p>
 				</div>
+				<div>
+					<a href="{% url 'project_del' pk=project.pk %}" class="text-decoration-none link-danger">
+						Delete
+					</a>
+				</div>
 			</div>
 		{% endfor %}
         <nav aria-label="Page navigation example" class="page">
