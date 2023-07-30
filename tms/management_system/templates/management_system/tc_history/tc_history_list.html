@@ -56,7 +56,7 @@
 	</style>
 
 	<div class="btn-back">
-		<a href="{% url 'tc_update' proj_id=proj_id pk=tc.pk %}" class="btn btn-secondary">
+		<a href="{% url 'tc_update' proj_id=proj_id suit_id=suit_id pk=tc.pk %}" class="btn btn-secondary">
 			Back in {{ tc.name }}
 		</a>
 	</div>
@@ -71,7 +71,7 @@
 					<p class="tag" >{{ tc.status }}</p>
 				</div>
 				<div>
-					<a href="{% url 'tc_history_detail' proj_id=proj_id pk=tc.pk %}" class="btn btn-info">
+					<a href="{% url 'tc_history_detail' proj_id=proj_id suit_id=suit_id  pk=tc.pk %}" class="btn btn-info">
 						View
 					</a>
 				</div>

@@ -1,84 +1,54 @@
 {% extends 'root.html' %}
 
-
 {% block title %}
-    TC
+    Main
 {% endblock %}
 
 {% block content %}
-
 	<style>
+		.cards-wrapper {
+			margin: 0 1.5rem 1.5rem 1.5rem;
+		}
+
+        .project-card {
+        	padding-top: calc(var(--bs-gutter-x) * .5);
+        	padding-right: calc(var(--bs-gutter-x) * 1);
+        	padding-bottom: calc(var(--bs-gutter-x) * .5);
+        	padding-left: 0;
+        }
 
 		.page {
 			margin: 1rem 0;
 		}
-
-		.table {
-			margin: 1.5rem;
-		}
-
-		th {
-			width: 10rem;
-			max-width: 10rem;
-			word-wrap: break-word;
-		}
-
-		td {
-			width: 10rem;
-			max-width: 10rem;
-			word-wrap: break-word;
-		}
-
-		.tag {
-			border-radius: 4px;
-			background-color: lightblue;
-			padding: 0.25rem 0.5rem;
-			text-decoration: none;
-		}
 	</style>
-
 	<div class="btn-toolbar" role="toolbar">
-		<a href="{% url 'suits' pk=proj_id %}" class="btn btn-secondary">
-			Back in {{ suit_name }}
-		</a>
-		<a href="{% url 'tc_create' proj_id=proj_id suit_id=suit_id %}" class="btn btn-secondary" >
-			New test-case
+		<a href="{% url 'suit_create' proj_id=proj_id %}" class="btn btn-secondary">
+			New suit
 		</a>
 	</div>
-    <table class="table">
-		<thread>
-			<tr>
-				<th scope="col">#</th>
-				<th scope="col">TC Name</th>
-				<th scope="col">TC Description</th>
-				<th scope="col">Status</th>
-				<th scope="col">Created by</th>
-				<th scope="col">Creation Date</th>
-				<th scope="col">Modified by</th>
-				<th scope="col">Modification Date</th>
-				<th scope="col"> </th>
-			</tr>
-		</thread>
-		{% for tc in test_cases %}
-			<tbody>
-				<tr>
-					<th scope="row">{{ tc.id }}</th>
-					<td><a href="{% url 'tc_update' proj_id=proj_id suit_id=suit_id pk=tc.pk %}" class="card-title">{{ tc.name }}</a></td>
-					<td>{{ tc.desc }}</td>
-					<td>{{ tc.status }}</td>
-					<td>{{ tc.user.username }}</td>
-					<td>{{ tc.creation_date }}</td>
-					<td>{{ tc.modified_by }}</td>
-					<td>{{ tc.modification_date }}</td>
-					<td>
-						<a href="{% url 'tc_delete' proj_id=proj_id suit_id=suit_id pk=tc.pk %}" class="text-decoration-none link-danger">
-							Delete
-						</a>
-					</td>
-				</tr>
-			</tbody>
+    <div class="row cards-wrapper">
+		{% for suit in suits %}
+		<div class="col-sm-6 col-md-4 col-lg-3 project-card">
+			<div class="card">
+				<div class="card-body">
+					<div class="card-title">
+						<a href="{% url 'test_cases' proj_id=proj_id suit_id=suit.pk %}">{{ suit.name }}</a>
+					</div>
+					<p>Description: {{ suit.desc }}</p>
+					<p>Author: {{ suit.user.username }}</p>
+					<p>Creation date: {{ suit.creation_date }}</p>
+					<p>Modified by: {{ suit.modified_by }}</p>
+					<p>Modification date: {{ suit.modification_date }}</p>
+					<a href="{% url 'suit_update' proj_id=suit.proj_id pk=suit.pk %}" class="btn btn-secondary">
+						Edit
+					</a>
+					<a href="{% url 'suit_del' proj_id=suit.proj_id pk=suit.pk %}" class="btn btn-danger">
+						Delete
+					</a>
+				</div>
+			</div>
+		</div>
 		{% endfor %}
-    </table>
         <nav aria-label="Page navigation example" class="page">
         <ul class="pagination">
             {% if page_obj.has_previous %}
@@ -120,4 +90,5 @@
             {% endif %}
         </ul>
     </nav>
+    </div>
 {% endblock %}

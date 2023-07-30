@@ -2,7 +2,7 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 from django.forms import PasswordInput, EmailInput
 
-from .models import CustomUser, Project, TC
+from .models import CustomUser, Project, TC, Suit
 
 TC_STATUS = [
     ("ACTIVE", "ACTIVE"),
@@ -59,12 +59,29 @@ class ProjectCreateForm(forms.ModelForm):
                   'user_id']
 
 
+class SuitCreateForm(forms.ModelForm):
+    name = forms.CharField(max_length=100)
+    desc = forms.CharField(widget=forms.Textarea)
+    user_id = forms.IntegerField(required=False)
+    proj_id = forms.IntegerField(required=False)
+    modified_by_id = forms.IntegerField(required=False)
+
+    class Meta:
+        model = Suit
+        fields = ['name',
+                  'desc',
+                  'user_id',
+                  'proj_id',
+                  'modified_by_id']
+
+
 class TestCaseCreateForm(forms.ModelForm):
     name = forms.CharField(max_length=200)
     desc = forms.CharField(widget=forms.Textarea)
     creator_id = forms.IntegerField(required=False)
     modified_by_id = forms.IntegerField(required=False)
     proj_id = forms.IntegerField(required=False)
+    suit_id = forms.IntegerField(required=False)
     status = forms.ChoiceField(choices=TC_STATUS)
     steps = forms.JSONField(required=False)
 
@@ -75,5 +92,6 @@ class TestCaseCreateForm(forms.ModelForm):
                   'creator_id',
                   'modified_by_id',
                   'proj_id',
+                  'suit_id',
                   'status',
                   'steps']

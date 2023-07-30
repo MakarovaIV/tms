@@ -10,8 +10,8 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy
 from django.views.generic import ListView, CreateView, DetailView, UpdateView, DeleteView
 
-from .forms import SignUpForm, ProjectCreateForm, TestCaseCreateForm
-from .models import CustomUser, Project, TC, TCHistory
+from .forms import SignUpForm, ProjectCreateForm, TestCaseCreateForm, SuitCreateForm
+from .models import CustomUser, Project, TC, TCHistory, Suit
 
 
 def register(request):
@@ -129,24 +129,117 @@ class ProjectDeleteView(DeleteView):
     success_url = reverse_lazy('projects')
 
 
-class TestCaseView(ListView):
-    model = TC
-    template_name = 'management_system/test_cases/test_cases_list.html'
-    context_object_name = 'test_cases'
+class SuitView(ListView):
+    model = Suit
+    template_name = 'management_system/suits/suit_list.html'
+    context_object_name = 'suits'
 
     def get_queryset(self):
         self.proj_id = get_object_or_404(Project, id=self.kwargs['pk'])
-        return TC.objects.filter(proj_id=self.proj_id).order_by('id')
+        return Suit.objects.filter(proj_id=self.proj_id).order_by('id')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["user_id"] = self.request.user.id
         project = get_object_or_404(Project, id=self.kwargs['pk'])
         context['modified_users'] = []
+        for suit in context['suits']:
+            suit.modified_by = get_object_or_404(CustomUser, id=suit.modified_by).username
+        context["proj_id"] = project.id or None
+        context["proj_name"] = project.name or None
+        return context
+
+
+class SuitCreateView(CreateView):
+    model = Suit
+    form_class = SuitCreateForm
+    template_name = 'management_system/suits/suit_form.html'
+    context_object_name = 'suit'
+
+    def get_success_url(self):
+        return reverse_lazy('suits', kwargs={'pk': self.kwargs['proj_id']})
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["user_id"] = self.request.user.id
+        context["proj_id"] = get_object_or_404(Project, id=self.kwargs['proj_id']).id
+        return context
+
+    def form_valid(self, form):
+        form.instance.user = self.request.user
+        form.instance.modified_by = self.request.user.id
+        project = get_object_or_404(Project, id=self.kwargs['proj_id'])
+        form.instance.proj = project
+        form.save()
+        return super(SuitCreateView, self).form_valid(form)
+
+
+class SuitEditView(UpdateView):
+    model = Suit
+    form_class = SuitCreateForm
+    template_name = 'management_system/suits/suit_form.html'
+    context_object_name = 'suit'
+    success_url = reverse_lazy('suits')
+
+    def get_success_url(self):
+        return reverse_lazy('suits', kwargs={'pk': self.kwargs['proj_id']})
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["user_id"] = self.request.user.id
+        context["proj_id"] = get_object_or_404(Project, id=self.kwargs['proj_id']).id
+        suit = get_object_or_404(Suit, id=self.kwargs['pk'])
+        modified_by_id = get_object_or_404(CustomUser, id=suit.modified_by)
+        context["name"] = suit.name
+        context["desc"] = suit.desc
+        context["modified_by"] = modified_by_id
+        return context
+
+    def form_valid(self, form):
+        form.instance.user = self.request.user
+        form.instance.modified_by = self.request.user.id
+        project = get_object_or_404(Project, id=self.kwargs['proj_id'])
+        form.instance.proj = project
+        form.save()
+        return super(SuitEditView, self).form_valid(form)
+
+
+class SuitDeleteView(DeleteView):
+    model = Suit
+    template_name = 'management_system/suits/suit_form_delete.html'
+    success_url = reverse_lazy('suits')
+
+    def get_success_url(self):
+        return reverse_lazy('suits', kwargs={'pk': self.kwargs['proj_id']})
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["user_id"] = self.request.user.id
+        context["proj_id"] = get_object_or_404(Project, id=self.kwargs['proj_id']).id
+        return context
+
+
+class TestCaseView(ListView):
+    model = TC
+    template_name = 'management_system/test_cases/test_cases_list.html'
+    context_object_name = 'test_cases'
+
+    def get_queryset(self):
+        self.proj_id = get_object_or_404(Project, id=self.kwargs['proj_id'])
+        self.suit_id = get_object_or_404(Suit, id=self.kwargs['suit_id'])
+        return TC.objects.filter(suit_id=self.suit_id).order_by('id')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["user_id"] = self.request.user.id
+        project = get_object_or_404(Project, id=self.kwargs['proj_id'])
+        suit = get_object_or_404(Suit, id=self.kwargs['suit_id'])
+        context['modified_users'] = []
         for test_case in context['test_cases']:
             test_case.modified_by = get_object_or_404(CustomUser, id=test_case.modified_by).username
         context["proj_id"] = project.id or None
-        context["proj_name"] = project.name or None
+        context["suit_id"] = suit.id or None
+        context["suit_name"] = suit.name or None
         return context
 
 
@@ -156,12 +249,13 @@ class TestCaseCreateView(CreateView):
     template_name = 'management_system/test_cases/test_cases_form.html'
 
     def get_success_url(self):
-        return reverse_lazy('test_cases', kwargs={'pk': self.kwargs['proj_id']})
+        return reverse_lazy('test_cases', kwargs={'proj_id': self.kwargs['proj_id'], 'suit_id': self.kwargs['suit_id']})
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["user_id"] = self.request.user.id
         context["proj_id"] = get_object_or_404(Project, id=self.kwargs['proj_id']).id
+        context["suit_id"] = get_object_or_404(Suit, id=self.kwargs['suit_id']).id
         context["steps"] = [{"index": 0, "step_name": "Step name", "step_value": "Expected result"}]
         return context
 
@@ -170,6 +264,8 @@ class TestCaseCreateView(CreateView):
         form.instance.modified_by = self.request.user.id
         project = get_object_or_404(Project, id=self.kwargs['proj_id'])
         form.instance.proj = project
+        suit = get_object_or_404(Suit, id=self.kwargs['suit_id'])
+        form.instance.suit = suit
         form.save()
         name = form.instance.name
         desc = form.instance.desc
@@ -179,6 +275,7 @@ class TestCaseCreateView(CreateView):
         creation_date = form.instance.creation_date
         modification_date = form.instance.modification_date
         proj_id = form.instance.proj_id
+        suit_id = form.instance.suit_id
         tc_id = form.instance.id
         user_id = form.instance.user_id
         TCHistory.objects.create(name=name,
@@ -189,6 +286,7 @@ class TestCaseCreateView(CreateView):
                                  creation_date=creation_date,
                                  modification_date=modification_date,
                                  proj_id=proj_id,
+                                 suit_id=suit_id,
                                  tc_id=tc_id,
                                  user_id=user_id)
         return super(TestCaseCreateView, self).form_valid(form)
@@ -204,12 +302,13 @@ class TestCaseUpdate(UpdateView):
     template_name = 'management_system/test_cases/test_cases_form.html'
 
     def get_success_url(self):
-        return reverse_lazy('test_cases', kwargs={'pk': self.kwargs['proj_id']})
+        return reverse_lazy('test_cases', kwargs={'proj_id': self.kwargs['proj_id'], 'suit_id': self.kwargs['suit_id']})
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["user_id"] = self.request.user.id
         context["proj_id"] = get_object_or_404(Project, id=self.kwargs['proj_id']).id
+        context["suit_id"] = get_object_or_404(Suit, id=self.kwargs['suit_id']).id
         tc = get_object_or_404(TC, id=self.kwargs['pk'])
         modified_by_id = get_object_or_404(CustomUser, id=tc.modified_by)
         context["name"] = tc.name
@@ -224,6 +323,8 @@ class TestCaseUpdate(UpdateView):
         form.instance.modified_by = self.request.user.id
         project = get_object_or_404(Project, id=self.kwargs['proj_id'])
         form.instance.proj = project
+        suit = get_object_or_404(Suit, id=self.kwargs['suit_id'])
+        form.instance.suit = suit
         form.save()
         name = form.instance.name
         desc = form.instance.desc
@@ -233,6 +334,7 @@ class TestCaseUpdate(UpdateView):
         creation_date = form.instance.creation_date
         modification_date = form.instance.modification_date
         proj_id = form.instance.proj_id
+        suit_id = form.instance.suit_id
         tc_id = form.instance.id
         user_id = form.instance.user_id
         TCHistory.objects.create(name=name,
@@ -243,6 +345,7 @@ class TestCaseUpdate(UpdateView):
                                  creation_date=creation_date,
                                  modification_date=modification_date,
                                  proj_id=proj_id,
+                                 suit_id=suit_id,
                                  tc_id=tc_id,
                                  user_id=user_id)
         return super(TestCaseUpdate, self).form_valid(form)
@@ -253,12 +356,13 @@ class TestCaseDelete(DeleteView):
     template_name = 'management_system/test_cases/test_cases_form_delete.html'
 
     def get_success_url(self):
-        return reverse_lazy('test_cases', kwargs={'pk': self.kwargs['proj_id']})
+        return reverse_lazy('test_cases', kwargs={'proj_id': self.kwargs['proj_id'], 'suit_id': self.kwargs['suit_id']})
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["user_id"] = self.request.user.id
         context["proj_id"] = get_object_or_404(Project, id=self.kwargs['proj_id']).id
+        context["suit_id"] = get_object_or_404(Suit, id=self.kwargs['suit_id']).id
         return context
 
 
@@ -268,6 +372,8 @@ class TCHistoryView(ListView):
     context_object_name = 'tc_history'
 
     def get_queryset(self):
+        self.proj_id = get_object_or_404(Project, id=self.kwargs['proj_id'])
+        self.suit_id = get_object_or_404(Suit, id=self.kwargs['suit_id'])
         self.pk = get_object_or_404(TC, id=self.kwargs['pk'])
         return TCHistory.objects.filter(tc_id=self.pk)
 
@@ -275,6 +381,7 @@ class TCHistoryView(ListView):
         context = super().get_context_data(**kwargs)
         context["user_id"] = self.request.user.id
         context["proj_id"] = get_object_or_404(Project, id=self.kwargs['proj_id']).id
+        context["suit_id"] = get_object_or_404(Suit, id=self.kwargs['suit_id']).id
         tc = get_object_or_404(TC, id=self.kwargs['pk'])
         modified_by_id = get_object_or_404(CustomUser, id=tc.modified_by)
         context["tc"] = tc
@@ -294,15 +401,17 @@ class TCHistoryDetailView(DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["proj_id"] = get_object_or_404(Project, id=self.kwargs['proj_id']).id
+        context["suit_id"] = get_object_or_404(Suit, id=self.kwargs['suit_id']).id
         context["tc"] = get_object_or_404(TC, id=self.object.tc_id)
         return context
 
     def get_success_url(self):
         return reverse_lazy('tc_history_detail', kwargs={'proj_id': self.kwargs['proj_id'],
+                                                         'suit_id': self.kwargs['suit_id'],
                                                          'tc': self.object.tc_id})
 
 
-def recover_tc(request, proj_id, tc_pk, pk):
+def recover_tc(request, proj_id, suit_id, tc_id, pk):
     data = request.POST.copy()
     if request.user.is_authenticated:
         tc = TCHistory.objects.filter(pk=pk).get()
@@ -314,15 +423,17 @@ def recover_tc(request, proj_id, tc_pk, pk):
         creation_date = tc.creation_date
         modification_date = tc.modification_date
         proj_id = tc.proj_id
+        suit_id = tc.suit_id
         user_id = tc.user_id
-        updated_tc = TC.objects.filter(pk=tc.tc_id).update(name=name,
-                                                        desc=desc,
-                                                        modified_by=modified_by,
-                                                        status=status,
-                                                        steps=steps,
-                                                        creation_date=creation_date,
-                                                        modification_date=modification_date,
-                                                        proj_id=proj_id,
-                                                        user_id=user_id)
+        TC.objects.filter(pk=tc.tc_id).update(name=name,
+                                              desc=desc,
+                                              modified_by=modified_by,
+                                              status=status,
+                                              steps=steps,
+                                              creation_date=creation_date,
+                                              modification_date=modification_date,
+                                              proj_id=proj_id,
+                                              suit_id=suit_id,
+                                              user_id=user_id)
         # updated_tc.save()
-        return redirect('tc_update', proj_id=proj_id, pk=tc.tc_id)
+        return redirect('tc_update', proj_id=proj_id, suit_id=suit_id, pk=tc.tc_id)

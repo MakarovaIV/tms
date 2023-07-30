@@ -27,12 +27,12 @@
 </style>
 	<div class="proj-wrapper">
 		<div class="btn-back">
-			<a href="{% url 'tc_history' proj_id=proj_id pk=tc.id %}" class="btn btn-secondary">
+			<a href="{% url 'tc_history' proj_id=proj_id suit_id=suit_id pk=tc.id %}" class="btn btn-secondary">
 				Back in {{ tc_history_detail.name }}
 			</a>
 		</div>
 
-		<form action="{% url 'tc_history_recover' proj_id=proj_id tc_pk=tc.id pk=tc_history_detail.id %}" method="post">
+		<form action="{% url 'tc_history_recover' proj_id=proj_id suit_id=suit_id tc_id=tc.id pk=tc_history_detail.id %}" method="post">
 
 			<button class="btn btn-outline-secondary" type="submit" >Recover version {{ tc_history_detail.id }}</button>
 
@@ -42,6 +42,7 @@
 				{% csrf_token %}
 					<input name="user_id" value="{{ user_id }}" class="invisible"/>
 					<input name="proj_id" value="{{ proj_id }}" class="invisible"/>
+					<input name="suit_id" value="{{ suit_id }}" class="invisible"/>
 					<input name="steps" class="invisible"/>
 					<p>{{ tc_history_detail.name }}</p>
 					<p>{{ tc_history_detail.desc }}</p>

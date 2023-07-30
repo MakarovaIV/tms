@@ -15,22 +15,19 @@
 </style>
 	<div class="proj-wrapper">
 		{% if user.is_authenticated %}
-
-
-			{% if project and project.pk %}
-			<form action="{% url 'project_update' pk=project.pk %}" method="post">
-
-				<h3>Edit project</h3>
+			{% if suit and suit.pk %}
+			<form action="{% url 'suit_update' proj_id=proj_id pk=suit.pk %}" method="post">
+				<h3>Edit suit</h3>
 			{% else %}
-			<form action="{% url 'project_create' %}" method="post">
-				<h3>Create new project</h3>
+			<form action="{% url 'suit_create' proj_id=proj_id %}" method="post">
+				<h3>Create new suit</h3>
 			{% endif %}
 
 			{% csrf_token %}
 				<input name="user_id" value="{{ user_id }}" class="invisible"/>
 				<p>
-					<label for="ProjName">Project name</label>
-					<input name="name" id="ProjName" value="{{ name }}"/>
+					<label for="SuitName">Suit name</label>
+					<input name="name" id="SuitName" value="{{ name }}"/>
 				</p>
 				<p>
 					<label for="Desc">Description</label>
