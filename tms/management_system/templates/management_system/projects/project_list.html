@@ -5,58 +5,49 @@
 {% endblock %}
 
 {% block content %}
-
 	<style>
-		.main {
-			display: flex;
-			flex-direction: column;
-			align-items: center;
-			flex-grow: 1;
+		.cards-wrapper {
+			margin: 0 1.5rem 1.5rem 1.5rem;
 		}
 
-		.proj {
-			border-bottom: 1px solid grey;
-			width: 100%;
-		}
-
-		.proj-div {
-			display: flex;
-			border-top: `px` solid grey;
-			gap: 1rem;
-		}
-
-		.proj-body {
-			flex-grow:1;
-		}
+        .project-card {
+        	padding-top: calc(var(--bs-gutter-x) * .5);
+        	padding-right: calc(var(--bs-gutter-x) * 1);
+        	padding-bottom: calc(var(--bs-gutter-x) * .5);
+        	padding-left: 0;
+        }
 
 		.page {
 			margin: 1rem 0;
 		}
-
-		footer {
-			position: fixed;
-			bottom: 0;
-			margin-left: 1rem;
-			margin-bottom: 1rem;
-		}
 	</style>
-    <div class="main">
+	<div class="btn-toolbar" role="toolbar">
+		<a href="{% url 'project_create' %}" class="btn btn-secondary">
+			New project
+		</a>
+	</div>
+    <div class="row cards-wrapper">
 		{% for project in projects %}
-			<div class="proj-div">
-				<div class="proj-body">
-					<a href="{% url 'test_cases' project.pk %}" class="card-title">{{project.name}}</a>
-					<span>{{project.desc}}</span>
-				</div>
-				<div>
-					<p>{{project.user.username}}</p>
-					<p>{{project.creation_date}}</p>
-				</div>
-				<div>
-					<a href="{% url 'project_del' pk=project.pk %}" class="text-decoration-none link-danger">
+		<div class="col-sm-6 col-md-4 col-lg-3 project-card">
+			<div class="card">
+				<div class="card-body">
+					<div class="card-title">
+						<a href="{% url 'test_cases' project.pk %}">{{project.name}}</a>
+					</div>
+					<p>Description: {{project.desc}}</p>
+					<p>Author: {{project.user.username}}</p>
+					<p>Creation date: {{project.creation_date}}</p>
+
+
+					<a href="{% url 'project_update' pk=project.pk %}" class="btn btn-secondary">
+						Edit
+					</a>
+					<a href="{% url 'project_del' pk=project.pk %}" class="btn btn-danger">
 						Delete
 					</a>
 				</div>
 			</div>
+		</div>
 		{% endfor %}
         <nav aria-label="Page navigation example" class="page">
         <ul class="pagination">
@@ -100,12 +91,4 @@
         </ul>
     </nav>
     </div>
-{% endblock %}
-{% block footer %}
-	<div>
-		<a href="{% url 'project_create' %}" class="btn btn-secondary">
-			New project
-		</a>
-	</div>
-
 {% endblock %}

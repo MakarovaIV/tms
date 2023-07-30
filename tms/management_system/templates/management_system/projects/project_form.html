@@ -15,8 +15,16 @@
 </style>
 	<div class="proj-wrapper">
 		{% if user.is_authenticated %}
-			<h3>Create new project</h3>
+
+
+			{% if project and project.pk %}
+			<form action="{% url 'project_update' pk=project.pk %}" method="post">
+
+				<h3>Edit project</h3>
+			{% else %}
 			<form action="{% url 'project_create' %}" method="post">
+				<h3>Create new project</h3>
+			{% endif %}
 
 			{% csrf_token %}
 				<input name="user_id" value="{{ user_id }}" class="invisible"/>

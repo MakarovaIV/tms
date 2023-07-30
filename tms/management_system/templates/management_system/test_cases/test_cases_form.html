@@ -129,7 +129,7 @@
 			{% endif %}
 
 			{% if tc and tc.pk %}
-			<form action="{% url 'tc_update' proj_id=proj_id pk=tc.pk %}" method="post">
+			<form action="{% url 'tc_update' proj_id=proj_id pk=tc.pk %}" method="post" id="myForm">
 			{% else %}
 			<form action="{% url 'tc_create' proj_id=proj_id %}" method="post">
 			{% endif %}
@@ -142,9 +142,6 @@
 					<label for="TCName">Test-case name</label>
 					<input name="name" id="TCName" value="{{ name }}"/>
 				</p>
-
-
-
 				{% if tc and tc.pk %}
 					<p>
 						<label>Created by: {{ tc.user.username }}</label>
@@ -183,7 +180,22 @@
 					<option {% if 'OUTDATED' == status %} selected {% endif %}>OUTDATED</option>
 				</select>
 			</form>
-			<button class="btn btn-success" onclick="submitHandler()">Save</button>
+
+			<button class="btn btn-success" type="button" data-bs-toggle="modal" data-bs-target="#exampleModal">Save</button>
+			<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+			  <div class="modal-dialog">
+				<div class="modal-content">
+				  <div class="modal-header">
+					<h5 class="modal-title" id="exampleModalLabel">Are you sure to save changes?</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				  </div>
+				  <div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+					<button type="button" class="btn btn-primary" onclick="submitHandler()">Save changes</button>
+				  </div>
+				</div>
+			  </div>
+			</div>
 		{% else %}
 			<p>You are not authorized</p>
 		{% endif %}

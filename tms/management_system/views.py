@@ -78,6 +78,9 @@ class ProjectView(ListView):
     template_name = 'management_system/projects/project_list.html'
     context_object_name = 'projects'
 
+    def get_queryset(self):
+        return Project.objects.all().order_by('id')
+
 
 class ProjectCreateView(CreateView):
     model = Project
@@ -96,6 +99,30 @@ class ProjectCreateView(CreateView):
         return super(ProjectCreateView, self).form_valid(form)
 
 
+class ProjectEditView(UpdateView):
+    model = Project
+    form_class = ProjectCreateForm
+    template_name = 'management_system/projects/project_form.html'
+    context_object_name = 'project'
+    success_url = reverse_lazy('projects')
+
+    def get_queryset(self):
+        return Project.objects.filter(id=self.kwargs['pk'])
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["user_id"] = self.request.user.id
+        proj = get_object_or_404(Project, id=self.kwargs['pk'])
+        context["name"] = proj.name
+        context["desc"] = proj.desc
+        return context
+
+    def form_valid(self, form):
+        form.instance.user = self.request.user
+        form.save()
+        return super(ProjectEditView, self).form_valid(form)
+
+
 class ProjectDeleteView(DeleteView):
     model = Project
     template_name = 'management_system/projects/project_form_delete.html'
@@ -109,12 +136,15 @@ class TestCaseView(ListView):
 
     def get_queryset(self):
         self.proj_id = get_object_or_404(Project, id=self.kwargs['pk'])
-        return TC.objects.filter(proj_id=self.proj_id)
+        return TC.objects.filter(proj_id=self.proj_id).order_by('id')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["user_id"] = self.request.user.id
         project = get_object_or_404(Project, id=self.kwargs['pk'])
+        context['modified_users'] = []
+        for test_case in context['test_cases']:
+            test_case.modified_by = get_object_or_404(CustomUser, id=test_case.modified_by).username
         context["proj_id"] = project.id or None
         context["proj_name"] = project.name or None
         return context

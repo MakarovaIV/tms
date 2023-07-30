@@ -8,37 +8,9 @@
 {% block content %}
 
 	<style>
-		.main {
-			display: flex;
-			flex-direction: column;
-			align-items: center;
-			flex-grow: 1;
-		}
-
-		.proj {
-			border-bottom: 1px solid grey;
-			width: 100%;
-		}
-
-		.proj-div {
-			display: flex;
-			border-top: `px` solid grey;
-			gap: 1rem;
-		}
-
-		.proj-body {
-			flex-grow:1;
-		}
 
 		.page {
 			margin: 1rem 0;
-		}
-
-		footer {
-			position: fixed;
-			bottom: 0;
-			margin-left: 1rem;
-			margin-bottom: 1rem;
 		}
 
 		.tag {
@@ -47,39 +19,50 @@
 			padding: 0.25rem 0.5rem;
 			text-decoration: none;
 		}
-
-		.btn-back {
-			position: fixed;
-			margin-left: 1rem;
-			margin-bottom: 1rem;
-		}
 	</style>
 
-	<div class="btn-back">
+	<div class="btn-toolbar" role="toolbar">
 		<a href="{% url 'projects' %}" class="btn btn-secondary">
 			Back in {{ proj_name }}
 		</a>
+		<a href="{% url 'tc_create' proj_id=proj_id %}" class="btn btn-secondary" >
+			New test-case
+		</a>
 	</div>
-    <div class="main">
+    <table class="table">
+		<thread>
+			<tr>
+				<th scope="col">#</th>
+				<th scope="col">TC Name</th>
+				<th scope="col">TC Description</th>
+				<th scope="col">Status</th>
+				<th scope="col">Created by</th>
+				<th scope="col">Creation Date</th>
+				<th scope="col">Modified by</th>
+				<th scope="col">Modification Date</th>
+				<th scope="col"> </th>
+			</tr>
+		</thread>
 		{% for tc in test_cases %}
-			<div class="proj-div">
-				<div class="proj-body">
-					<a href="{% url 'tc_update' proj_id=proj_id pk=tc.pk %}" class="card-title">{{ tc.name }}</a>
-					<span>{{ tc.desc }}</span>
-				</div>
-				<div>
-					<p>Author {{ tc.user.username }}</p>
-					<p>{{ tc.creation_date }}</p>
-					<p>{{ tc.modification_date }}</p>
-					<p class="tag" >{{ tc.status }}</p>
-				</div>
-				<div>
-					<a href="{% url 'tc_delete' proj_id=proj_id pk=tc.pk %}" class="text-decoration-none link-danger">
-						Delete
-					</a>
-				</div>
-			</div>
+			<tbody>
+				<tr>
+					<th scope="row">{{ tc.id }}</th>
+					<td><a href="{% url 'tc_update' proj_id=proj_id pk=tc.pk %}" class="card-title">{{ tc.name }}</a></td>
+					<td>{{ tc.desc }}</td>
+					<td>{{ tc.status }}</td>
+					<td>{{ tc.user.username }}</td>
+					<td>{{ tc.creation_date }}</td>
+					<td>{{ tc.modified_by }}</td>
+					<td>{{ tc.modification_date }}</td>
+					<td>
+						<a href="{% url 'tc_delete' proj_id=proj_id pk=tc.pk %}" class="text-decoration-none link-danger">
+							Delete
+						</a>
+					</td>
+				</tr>
+			</tbody>
 		{% endfor %}
+    </table>
         <nav aria-label="Page navigation example" class="page">
         <ul class="pagination">
             {% if page_obj.has_previous %}
@@ -121,13 +104,4 @@
             {% endif %}
         </ul>
     </nav>
-    </div>
-{% endblock %}
-{% block footer %}
-	<div>
-		<a href="{% url 'tc_create' proj_id=proj_id %}" class="btn btn-secondary">
-			New test-case
-		</a>
-	</div>
-
 {% endblock %}
