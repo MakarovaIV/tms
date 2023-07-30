@@ -158,6 +158,7 @@
 					<p>
 						<label>Modification date: {{ tc.modification_date }}</label>
 					</p>
+					<a class="btn btn-success" href="{% url 'tc_history' proj_id=proj_id pk=tc.pk %}">Show history</a>
 				{% endif %}
 
 				<p>

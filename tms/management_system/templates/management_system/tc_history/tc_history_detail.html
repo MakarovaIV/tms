@@ -1,0 +1,65 @@
+{% extends 'root.html' %}
+
+{% block content %}
+<style>
+    .invisible {
+        display:none
+    }
+
+	.proj-wrapper {
+		display: flex;
+		flex-direction: column;
+		align-items: start;
+		flex-grow: 1;
+	}
+
+	.steps-wrapper {
+		display: flex;
+		flex-direction: column;
+	}
+
+	.step {
+		display: flex;
+		flex-direction: row;
+		gap: 1rem;
+		margin-top: 1rem;
+	}
+</style>
+	<div class="proj-wrapper">
+		<div class="btn-back">
+			<a href="{% url 'tc_history' proj_id=proj_id pk=tc.id %}" class="btn btn-secondary">
+				Back in {{ tc_history_detail.name }}
+			</a>
+		</div>
+
+		<form action="{% url 'tc_history_recover' proj_id=proj_id tc_pk=tc.id pk=tc_history_detail.id %}" method="post">
+
+			<button class="btn btn-outline-secondary" type="submit" >Recover version {{ tc_history_detail.id }}</button>
+
+			{% if user.is_authenticated %}
+				<h3>Version {{ tc_history_detail.id }}</h3>
+
+				{% csrf_token %}
+					<input name="user_id" value="{{ user_id }}" class="invisible"/>
+					<input name="proj_id" value="{{ proj_id }}" class="invisible"/>
+					<input name="steps" class="invisible"/>
+					<p>{{ tc_history_detail.name }}</p>
+					<p>{{ tc_history_detail.desc }}</p>
+					<div class="steps-wrapper" id="stepsWrapper">
+						{% for step in tc_history_detail.steps %}
+							<div class="step" data-index="{{ step.index }}">
+								<p class="step_number">{{ step.index }}</p>
+								<p>{{ step.step_name }}</p>
+								<p>{{ step.step_value }}</p>
+							</div>
+						{% endfor %}
+					</div>
+					<p name="status">{{ tc_history_detail.status }}</p>
+			{% else %}
+				<p>You are not authorized</p>
+			{% endif %}
+
+		</form>
+	</div>
+
+{% endblock %}

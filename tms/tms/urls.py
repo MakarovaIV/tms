@@ -32,4 +32,8 @@ urlpatterns = [
     path('projects/<int:proj_id>/tc_create/', views.TestCaseCreateView.as_view(), name="tc_create"),
     path('projects/<int:proj_id>/tc/<int:pk>', views.TestCaseUpdate.as_view(), name="tc_update"),
     path('projects/<int:proj_id>/tc/delete/<int:pk>', views.TestCaseDelete.as_view(), name="tc_delete"),
+    path('projects/<int:proj_id>/tc_history/<int:pk>', views.TCHistoryView.as_view(), name="tc_history"),
+    path('projects/<int:proj_id>/tc_history/<int:pk>/detail/', views.TCHistoryDetailView.as_view(),
+         name="tc_history_detail"),
+    path('projects/<int:proj_id>/tc_history/<int:tc_pk>/recover/<int:pk>', views.recover_tc, name="tc_history_recover"),
 ]

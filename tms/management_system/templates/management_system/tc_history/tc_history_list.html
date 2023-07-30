@@ -1,0 +1,128 @@
+{% extends 'root.html' %}
+
+
+{% block title %}
+    TC History
+{% endblock %}
+
+{% block content %}
+
+	<style>
+		.main {
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			flex-grow: 1;
+		}
+
+		.proj {
+			border-bottom: 1px solid grey;
+			width: 100%;
+		}
+
+		.proj-div {
+			display: flex;
+			border-top: `px` solid grey;
+			gap: 1rem;
+		}
+
+		.proj-body {
+			flex-grow:1;
+		}
+
+		.page {
+			margin: 1rem 0;
+		}
+
+		footer {
+			position: fixed;
+			bottom: 0;
+			margin-left: 1rem;
+			margin-bottom: 1rem;
+		}
+
+		.tag {
+			border-radius: 4px;
+			background-color: lightblue;
+			padding: 0.25rem 0.5rem;
+			text-decoration: none;
+		}
+
+		.btn-back {
+			position: fixed;
+			margin-left: 1rem;
+			margin-bottom: 1rem;
+		}
+	</style>
+
+	<div class="btn-back">
+		<a href="{% url 'tc_update' proj_id=proj_id pk=tc.pk %}" class="btn btn-secondary">
+			Back in {{ tc.name }}
+		</a>
+	</div>
+    <div class="main">
+		{% for tc in tc_history %}
+			<div class="proj-div">
+				<p>Version {{ tc.id }}</p>
+				<p>{{ tc.name }}</p>
+				<div>
+					<p>Author {{ tc.user.username }}</p>
+					<p>{{ tc.modification_date }}</p>
+					<p class="tag" >{{ tc.status }}</p>
+				</div>
+				<div>
+					<a href="{% url 'tc_history_detail' proj_id=proj_id pk=tc.pk %}" class="btn btn-info">
+						View
+					</a>
+				</div>
+			</div>
+		{% endfor %}
+        <nav aria-label="Page navigation example" class="page">
+        <ul class="pagination">
+            {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <a href="?page={{ page_obj.previous_page_number }}{% if sort_enabled %}&sort={{ sort }}{% endif %}{% if search %}&search={{ search }}{% endif %}"
+                       class="page-link">&laquo;</a>
+                </li>
+            {% else %}
+                <li class="page-item disabled">
+                    <span class="page-link">&laquo;</span>
+                </li>
+            {% endif %}
+
+            {% for page_number in page_obj.paginator.page_range %}
+                {% if page_obj.number == page_number %}
+                    <li class="page-item active">
+                        <span class="page-link">{{ page_number }}
+                        </span>
+                    </li>
+                {% else %}
+                    <li class="page-item">
+                        <a href="?page={{ page_number }}{% if sort_enabled %}&sort={{ sort }}{% endif %}{% if search %}&search={{ search }}{% endif %}"
+                           class="page-link">
+                            {{ page_number }}
+                        </a>
+                    </li>
+                {% endif %}
+            {% endfor %}
+
+            {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a href="?page={{ page_obj.next_page_number }}{% if sort_enabled %}&sort={{ sort }}{% endif %}{% if search %}&search={{ search }}{% endif %}"
+                       class="page-link">&raquo;</a>
+                </li>
+            {% else %}
+                <li class="page-item disabled">
+                    <span class="page-link">&raquo;</span>
+                </li>
+            {% endif %}
+        </ul>
+    </nav>
+    </div>
+{% endblock %}
+{% block footer %}
+	<div>
+
+	</div>
+
+{% endblock %}
