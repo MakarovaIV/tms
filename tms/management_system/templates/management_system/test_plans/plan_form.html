@@ -1,0 +1,66 @@
+{% extends 'root.html' %}
+
+{% block content %}
+<script>
+	var submitHandler = function() {
+		var form = document.querySelector("form");
+		form.submit();
+	};
+</script>
+	<div class="plan-wrapper">
+		{% if user.is_authenticated %}
+			{% if plan and plan.pk %}
+			<h3>Edit test-plan</h3>
+			{% else %}
+			<h3>Create new test-plan</h3>
+			{% endif %}
+
+			{% if plan and plan.pk %}
+			<form action="{% url 'plan_update' pk=plan.pk %}" method="post">
+			{% else %}
+			<form action="{% url 'plan_create' %}" method="post">
+			{% endif %}
+
+
+
+			{% csrf_token %}
+				<input name="user_id" value="{{ user_id }}" class="invisible"/>
+				<input name="modified_by_id" value="{{ modified_by_id }}" class="invisible"/>
+				<input name="structure" class="invisible" value="[]"/>
+				<p>
+					<label for="TPName">Test-case name</label>
+					<input name="name" id="TPName" value="{{ name }}"/>
+				</p>
+				<p>
+					<label for="Desc">Description</label>
+					<textarea name="desc" id="Desc">{{ desc }}</textarea>
+				</p>
+				<select name="status">
+					<option {% if 'IN PROGRESS' == status %} selected {% endif %}>IN PROGRESS</option>
+					<option {% if 'DONE' == status %} selected {% endif %}>DONE</option>
+					<option {% if 'CANCELLED' == status %} selected {% endif %}>CANCELLED</option>
+				</select>
+			</form>
+			</form>
+			<button class="btn btn-success" type="button" data-bs-toggle="modal" data-bs-target="#saveModal">Save</button>
+				<div class="modal fade" id="saveModal" tabindex="-1" aria-labelledby="saveModalLabel" aria-hidden="true">
+				  <div class="modal-dialog">
+					<div class="modal-content">
+					  <div class="modal-header">
+						<h5 class="modal-title" id="saveModalLabel">Are you sure to save changes?</h5>
+						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+					  </div>
+					  <div class="modal-footer">
+						<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+						<button type="button" class="btn btn-primary" onclick="submitHandler()">Save changes</button>
+					  </div>
+					</div>
+				  </div>
+				</div>
+		{% else %}
+			<p>You are not authorized</p>
+		{% endif %}
+	</div>
+
+
+{% endblock %}

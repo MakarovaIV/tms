@@ -54,6 +54,9 @@
 			<li class="nav-item">
                 <a class="nav-link" href="{% url 'projects' %}">Projects</a>
             </li>
+			<li class="nav-item">
+                <a class="nav-link" href="{% url 'plans' %}">Test-plans</a>
+            </li>
         </ul>
         <ul class="navbar-nav flex-row ml-md-auto d-none d-md-flex">
             {% if not user.is_authenticated %}

@@ -43,4 +43,9 @@ urlpatterns = [
     path('projects/<int:proj_id>/suit/<int:suit_id>/tc_history/<int:pk>/detail/', views.TCHistoryDetailView.as_view(), name="tc_history_detail"),
     path('projects/<int:proj_id>/suit/<int:suit_id>/tc_history/<int:tc_id>/recover/<int:pk>',
          views.recover_tc, name="tc_history_recover"),
+
+    path('plans/', views.PlanView.as_view(), name="plans"),
+    path('plan/create/', views.PlanCreateView.as_view(), name='plan_create'),
+    path('plan/delete/<int:pk>/', views.delete_test_plan, name='plan_del'),
+    path('plan/update/<int:pk>/', views.PlanEditView.as_view(), name='plan_update'),
 ]

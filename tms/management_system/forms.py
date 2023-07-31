@@ -2,12 +2,25 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 from django.forms import PasswordInput, EmailInput
 
-from .models import CustomUser, Project, TC, Suit
+from .models import CustomUser, Project, TC, Suit, TP
 
 TC_STATUS = [
     ("ACTIVE", "ACTIVE"),
     ("DRAFT", "DRAFT"),
     ("OUTDATED", "OUTDATED"),
+]
+
+TP_STATUS = [
+    ("IN PROGRESS", "IN PROGRESS"),
+    ("DONE", "DONE"),
+    ("CANCELLED", "CANCELLED"),
+]
+
+TC_IN_TP_STATUS = [
+    ("IN PROGRESS", "IN PROGRESS"),
+    ("SUCCEED", "SUCCEED"),
+    ("FAILED", "FAILED"),
+    ("SKIPPED", "SKIPPED"),
 ]
 
 
@@ -78,7 +91,7 @@ class SuitCreateForm(forms.ModelForm):
 class TestCaseCreateForm(forms.ModelForm):
     name = forms.CharField(max_length=200)
     desc = forms.CharField(widget=forms.Textarea)
-    creator_id = forms.IntegerField(required=False)
+    user_id = forms.IntegerField(required=False)
     modified_by_id = forms.IntegerField(required=False)
     proj_id = forms.IntegerField(required=False)
     suit_id = forms.IntegerField(required=False)
@@ -89,9 +102,27 @@ class TestCaseCreateForm(forms.ModelForm):
         model = TC
         fields = ['name',
                   'desc',
-                  'creator_id',
+                  'user_id',
                   'modified_by_id',
                   'proj_id',
                   'suit_id',
                   'status',
                   'steps']
+
+
+class TestPlanCreateForm(forms.ModelForm):
+    name = forms.CharField(max_length=200, error_messages={'required': 'Field name is invalid'})
+    desc = forms.CharField(widget=forms.Textarea, error_messages={'required': 'Field desc is invalid'})
+    user_id = forms.IntegerField(error_messages={'required': 'Field user_id is invalid'})
+    modified_by_id = forms.IntegerField(error_messages={'required': 'Field modified_by_id is invalid'})
+    structure = forms.JSONField(required=False, error_messages={'required': 'Field structure is invalid'})
+    status = forms.ChoiceField(choices=TP_STATUS, error_messages={'required': 'Field status is invalid'}, required=False)
+
+    class Meta:
+        model = TP
+        fields = ['name',
+                  'desc',
+                  'user_id',
+                  'modified_by_id',
+                  'structure',
+                  'status']

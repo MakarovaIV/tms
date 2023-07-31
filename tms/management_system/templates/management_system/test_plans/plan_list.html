@@ -1,0 +1,110 @@
+{% extends 'root.html' %}
+
+{% block title %}
+    Test plans
+{% endblock %}
+
+{% block content %}
+	<style>
+		.cards-wrapper {
+			margin: 0 1.5rem 1.5rem 1.5rem;
+		}
+
+        .project-card {
+        	padding-top: calc(var(--bs-gutter-x) * .5);
+        	padding-right: calc(var(--bs-gutter-x) * 1);
+        	padding-bottom: calc(var(--bs-gutter-x) * .5);
+        	padding-left: 0;
+        }
+
+		.page {
+			margin: 1rem 0;
+		}
+	</style>
+	<div class="btn-toolbar" role="toolbar">
+		<a href="{% url 'plan_create' %}" class="btn btn-secondary">
+			New test plan
+		</a>
+	</div>
+    <div class="row cards-wrapper">
+		{% for plan in plans %}
+		<div class="col-sm-6 col-md-4 col-lg-3 project-card">
+			<div class="card">
+				<div class="card-body">
+					<div class="card-title">
+						<a href="{% url 'plan_update' pk=plan.pk %}">{{plan.name}}</a>
+					</div>
+					<p>Description: {{plan.desc}}</p>
+					<p>Author: {{plan.user.username}}</p>
+					<p>Creation date: {{plan.creation_date}}</p>
+
+
+					<a href="{% url 'plan_update' pk=plan.pk %}" class="btn btn-secondary">
+						Edit
+					</a>
+					<button class="btn btn-danger" type="button" data-bs-toggle="modal" data-bs-target="#deleteModel_{{ plan.pk }}">Delete</button>
+				</div>
+			</div>
+		</div>
+		<form action="{% url 'plan_del' pk=plan.pk %}" method="post">
+
+		{% csrf_token %}
+			<div class="modal fade" id="deleteModel_{{ plan.pk }}" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+			  <div class="modal-dialog">
+				<div class="modal-content">
+				  <div class="modal-header">
+					<h5 class="modal-title" id="deleteModalLabel">Are you sure to delete test-case?</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				  </div>
+				  <div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+					<button class="btn btn-danger" type="submit">Delete</button>
+				  </div>
+				</div>
+			  </div>
+			</div>
+		</form>
+		{% endfor %}
+        <nav aria-label="Page navigation example" class="page">
+        <ul class="pagination">
+            {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <a href="?page={{ page_obj.previous_page_number }}{% if sort_enabled %}&sort={{ sort }}{% endif %}{% if search %}&search={{ search }}{% endif %}"
+                       class="page-link">&laquo;</a>
+                </li>
+            {% else %}
+                <li class="page-item disabled">
+                    <span class="page-link">&laquo;</span>
+                </li>
+            {% endif %}
+
+            {% for page_number in page_obj.paginator.page_range %}
+                {% if page_obj.number == page_number %}
+                    <li class="page-item active">
+                        <span class="page-link">{{ page_number }}
+                        </span>
+                    </li>
+                {% else %}
+                    <li class="page-item">
+                        <a href="?page={{ page_number }}{% if sort_enabled %}&sort={{ sort }}{% endif %}{% if search %}&search={{ search }}{% endif %}"
+                           class="page-link">
+                            {{ page_number }}
+                        </a>
+                    </li>
+                {% endif %}
+            {% endfor %}
+
+            {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a href="?page={{ page_obj.next_page_number }}{% if sort_enabled %}&sort={{ sort }}{% endif %}{% if search %}&search={{ search }}{% endif %}"
+                       class="page-link">&raquo;</a>
+                </li>
+            {% else %}
+                <li class="page-item disabled">
+                    <span class="page-link">&raquo;</span>
+                </li>
+            {% endif %}
+        </ul>
+    </nav>
+    </div>
+{% endblock %}
