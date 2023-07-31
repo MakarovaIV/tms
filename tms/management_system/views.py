@@ -124,8 +124,9 @@ class ProjectEditView(UpdateView):
 
 
 def delete_project(request, pk):
-    Project.objects.filter(id=pk).delete()
-    return redirect('projects')
+    if request.method == "POST":
+        Project.objects.filter(id=pk).delete()
+        return redirect('projects')
 
 
 class SuitView(ListView):
@@ -203,19 +204,10 @@ class SuitEditView(UpdateView):
         return super(SuitEditView, self).form_valid(form)
 
 
-class SuitDeleteView(DeleteView):
-    model = Suit
-    template_name = 'management_system/suits/suit_form_delete.html'
-    success_url = reverse_lazy('suits')
-
-    def get_success_url(self):
-        return reverse_lazy('suits', kwargs={'pk': self.kwargs['proj_id']})
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["user_id"] = self.request.user.id
-        context["proj_id"] = get_object_or_404(Project, id=self.kwargs['proj_id']).id
-        return context
+def delete_suit(request, proj_id, pk):
+    if request.method == "POST":
+        Suit.objects.filter(id=pk).delete()
+        return redirect('suits', pk=proj_id)
 
 
 class TestCaseView(ListView):
@@ -350,19 +342,10 @@ class TestCaseUpdate(UpdateView):
         return super(TestCaseUpdate, self).form_valid(form)
 
 
-class TestCaseDelete(DeleteView):
-    model = TC
-    template_name = 'management_system/test_cases/test_cases_form_delete.html'
-
-    def get_success_url(self):
-        return reverse_lazy('test_cases', kwargs={'proj_id': self.kwargs['proj_id'], 'suit_id': self.kwargs['suit_id']})
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["user_id"] = self.request.user.id
-        context["proj_id"] = get_object_or_404(Project, id=self.kwargs['proj_id']).id
-        context["suit_id"] = get_object_or_404(Suit, id=self.kwargs['suit_id']).id
-        return context
+def delete_test_case(request, proj_id, suit_id, pk):
+    if request.method == "POST":
+        TC.objects.filter(id=pk).delete()
+        return redirect('test_cases', proj_id=proj_id, suit_id=suit_id)
 
 
 class TCHistoryView(ListView):

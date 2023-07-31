@@ -71,15 +71,31 @@
 					<td>{{ tc.modified_by }}</td>
 					<td>{{ tc.modification_date }}</td>
 					<td>
-						<a href="{% url 'tc_delete' proj_id=proj_id suit_id=suit_id pk=tc.pk %}" class="text-decoration-none link-danger">
-							Delete
-						</a>
+						<button class="btn btn-danger" type="button" data-bs-toggle="modal" data-bs-target="#deleteModel_{{ tc.pk }}">Delete</button>
 					</td>
 				</tr>
 			</tbody>
+			<form action="{% url 'tc_delete' proj_id=proj_id suit_id=suit_id pk=tc.pk %}" method="post">
+
+				{% csrf_token %}
+					<div class="modal fade" id="deleteModel_{{ tc.pk }}" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+					  <div class="modal-dialog">
+						<div class="modal-content">
+						  <div class="modal-header">
+							<h5 class="modal-title" id="deleteModalLabel">Are you sure to delete test-case?</h5>
+							<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+						  </div>
+						  <div class="modal-footer">
+							<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+							<button class="btn btn-danger" type="submit">Delete</button>
+						  </div>
+						</div>
+					  </div>
+					</div>
+				</form>
 		{% endfor %}
     </table>
-        <nav aria-label="Page navigation example" class="page">
+        <nav aria-label="Page navigation" class="page">
         <ul class="pagination">
             {% if page_obj.has_previous %}
                 <li class="page-item">

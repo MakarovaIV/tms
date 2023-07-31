@@ -42,11 +42,28 @@
 					<a href="{% url 'suit_update' proj_id=suit.proj_id pk=suit.pk %}" class="btn btn-secondary">
 						Edit
 					</a>
-					<a href="{% url 'suit_del' proj_id=suit.proj_id pk=suit.pk %}" class="btn btn-danger">
-						Delete
-					</a>
+					<button class="btn btn-danger" type="button" data-bs-toggle="modal" data-bs-target="#deleteModel_{{ suit.pk }}">Delete</button>
+
 				</div>
 			</div>
+			<form action="{% url 'suit_del' proj_id=suit.proj_id pk=suit.pk %}" method="post">
+
+			{% csrf_token %}
+				<div class="modal fade" id="deleteModel_{{ suit.pk }}" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+				  <div class="modal-dialog">
+					<div class="modal-content">
+					  <div class="modal-header">
+						<h5 class="modal-title" id="deleteModalLabel">Are you sure to delete suit?</h5>
+						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+					  </div>
+					  <div class="modal-footer">
+						<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+						<button class="btn btn-danger" type="submit">Delete</button>
+					  </div>
+					</div>
+				  </div>
+				</div>
+			</form>
 		</div>
 		{% endfor %}
         <nav aria-label="Page navigation example" class="page">
