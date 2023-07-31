@@ -27,7 +27,7 @@ urlpatterns = [
     path('logout/', views.logout_handler, name="logout"),
     path('projects/', views.ProjectView.as_view(), name="projects"),
     path('project/create/', views.ProjectCreateView.as_view(), name='project_create'),
-    path('project/delete/<int:pk>/', views.ProjectDeleteView.as_view(), name='project_del'),
+    path('project/delete/<int:pk>/', views.delete_project, name='project_del'),
     path('project/update/<int:pk>/', views.ProjectEditView.as_view(), name='project_update'),
 
     path('projects/<int:pk>/suits/', views.SuitView.as_view(), name="suits"),

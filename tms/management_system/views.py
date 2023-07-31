@@ -123,10 +123,9 @@ class ProjectEditView(UpdateView):
         return super(ProjectEditView, self).form_valid(form)
 
 
-class ProjectDeleteView(DeleteView):
-    model = Project
-    template_name = 'management_system/projects/project_form_delete.html'
-    success_url = reverse_lazy('projects')
+def delete_project(request, pk):
+    Project.objects.filter(id=pk).delete()
+    return redirect('projects')
 
 
 class SuitView(ListView):
