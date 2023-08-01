@@ -46,7 +46,7 @@
 		</a>
 	</div>
     <table class="table">
-		<thread>
+		<thead>
 			<tr>
 				<th scope="col">#</th>
 				<th scope="col">TC Name</th>
@@ -58,11 +58,11 @@
 				<th scope="col">Modification Date</th>
 				<th scope="col"> </th>
 			</tr>
-		</thread>
-		{% for tc in test_cases %}
-			<tbody>
+		</thead>
+		<tbody>
+			{% for tc in test_cases %}
 				<tr>
-					<th scope="row">{{ tc.id }}</th>
+					<td scope="row">{{ tc.id }}</td>
 					<td><a href="{% url 'tc_update' proj_id=proj_id suit_id=suit_id pk=tc.pk %}" class="card-title">{{ tc.name }}</a></td>
 					<td>{{ tc.desc }}</td>
 					<td>{{ tc.status }}</td>
@@ -72,28 +72,28 @@
 					<td>{{ tc.modification_date }}</td>
 					<td>
 						<button class="btn btn-danger" type="button" data-bs-toggle="modal" data-bs-target="#deleteModel_{{ tc.pk }}">Delete</button>
+						<form action="{% url 'tc_delete' proj_id=proj_id suit_id=suit_id pk=tc.pk %}" method="post">
+						{% csrf_token %}
+							<div class="modal fade" id="deleteModel_{{ tc.pk }}" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+							  <div class="modal-dialog">
+								<div class="modal-content">
+								  <div class="modal-header">
+									<h5 class="modal-title" id="deleteModalLabel">Are you sure to delete test-case?</h5>
+									<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+								  </div>
+								  <div class="modal-footer">
+									<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+									<button class="btn btn-danger" type="submit">Delete</button>
+								  </div>
+								</div>
+							  </div>
+							</div>
+						</form>
 					</td>
 				</tr>
-			</tbody>
-			<form action="{% url 'tc_delete' proj_id=proj_id suit_id=suit_id pk=tc.pk %}" method="post">
+			{% endfor %}
+		</tbody>
 
-				{% csrf_token %}
-					<div class="modal fade" id="deleteModel_{{ tc.pk }}" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
-					  <div class="modal-dialog">
-						<div class="modal-content">
-						  <div class="modal-header">
-							<h5 class="modal-title" id="deleteModalLabel">Are you sure to delete test-case?</h5>
-							<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-						  </div>
-						  <div class="modal-footer">
-							<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-							<button class="btn btn-danger" type="submit">Delete</button>
-						  </div>
-						</div>
-					  </div>
-					</div>
-				</form>
-		{% endfor %}
     </table>
         <nav aria-label="Page navigation" class="page">
         <ul class="pagination">

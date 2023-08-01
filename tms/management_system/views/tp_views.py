@@ -29,7 +29,7 @@ class PlanCreateView(CreateView):
         context = super().get_context_data(**kwargs)
         context["user_id"] = self.request.user.id
         context["modified_by_id"] = self.request.user.id
-        context["structure"] = "[]"
+        context["structure"] = []
         return context
 
     def form_valid(self, form):
@@ -62,8 +62,8 @@ class PlanEditView(UpdateView):
         context = super().get_context_data(**kwargs)
         context["user_id"] = self.request.user.id
         context["modified_by_id"] = self.request.user.id
-        context["structure"] = "[]"
         plan = get_object_or_404(TP, id=self.kwargs['pk'])
+        context["structure"] = list(plan.proj.all())
         context["name"] = plan.name
         context["desc"] = plan.desc
         context["status"] = plan.status
