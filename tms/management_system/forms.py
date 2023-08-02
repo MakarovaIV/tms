@@ -115,7 +115,9 @@ class TestPlanCreateForm(forms.ModelForm):
     desc = forms.CharField(widget=forms.Textarea, error_messages={'required': 'Field desc is invalid'})
     user_id = forms.IntegerField(error_messages={'required': 'Field user_id is invalid'})
     modified_by_id = forms.IntegerField(error_messages={'required': 'Field modified_by_id is invalid'})
-    structure = forms.JSONField(required=False, error_messages={'required': 'Field structure is invalid'})
+    proj = forms.JSONField(error_messages={'required': 'Field proj is invalid'}, required=False)
+    suit = forms.JSONField(error_messages={'required': 'Field suit is invalid'}, required=False)
+    tc = forms.JSONField(error_messages={'required': 'Field tc is invalid'}, required=False)
     status = forms.ChoiceField(choices=TP_STATUS, error_messages={'required': 'Field status is invalid'}, required=False)
 
     class Meta:
@@ -124,5 +126,7 @@ class TestPlanCreateForm(forms.ModelForm):
                   'desc',
                   'user_id',
                   'modified_by_id',
-                  'structure',
+                  'proj',
+                  'suit',
+                  'tc',
                   'status']

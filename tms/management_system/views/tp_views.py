@@ -1,3 +1,5 @@
+import json
+
 from django.contrib import messages
 from django.shortcuts import redirect, get_object_or_404
 from django.urls import reverse_lazy
@@ -63,7 +65,33 @@ class PlanEditView(UpdateView):
         context["user_id"] = self.request.user.id
         context["modified_by_id"] = self.request.user.id
         plan = get_object_or_404(TP, id=self.kwargs['pk'])
-        context["structure"] = list(plan.proj.all())
+        projects = list(plan.proj.all())
+        structure = []
+        for p in projects:
+            suits_in_project = list(plan.suit.filter(proj_id=p.id))
+            suits = []
+            for s in suits_in_project:
+                cases_in_suit = list(plan.tc.filter(suit_id=s.id, proj_id=p.id))
+                cases = []
+                for c in cases_in_suit:
+                    case = {"id": c.id,
+                            "text": c.name,
+                            "icon": "fa-regular fa-file",
+                            "class": "tp-case"}
+                    cases.append(case)
+                suit = {"id": s.id,
+                        "text": s.name,
+                        "icon": "fa-solid fa-list",
+                        "class": "tp-suit",
+                        "nodes": cases}
+                suits.append(suit)
+            proj = {"id": p.id,
+                    "text": p.name,
+                    "icon": "fa-regular fa-folder",
+                    "class": "tp-proj",
+                    "nodes": suits}
+            structure.append(proj)
+        context["structure"] = json.dumps(structure)
         context["name"] = plan.name
         context["desc"] = plan.desc
         context["status"] = plan.status
@@ -76,5 +104,5 @@ class PlanEditView(UpdateView):
         return super(PlanEditView, self).form_valid(form)
 
     def form_invalid(self, form):
-        messages.error(self.request, form.errors['status'][0])
+        messages.error(self.request, form.errors)
         return self.render_to_response(self.get_context_data(form=form))

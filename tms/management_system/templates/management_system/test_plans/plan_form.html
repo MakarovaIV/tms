@@ -1,11 +1,37 @@
 {% extends 'root.html' %}
 
 {% block content %}
+<style>
+	.treeview span.icon.node-icon {
+		margin-right: 1rem;
+	}
+</style>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/patternfly-bootstrap-treeview@2.1.10/dist/bootstrap-treeview.min.css" rel="stylesheet">
+<script src="https://code.jquery.com/jquery-3.7.0.min.js" integrity="sha256-2Pmvv0kuTBOenSvLm6bvfBSSHrUJ+3A7x6P5Ebd07/g=" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/patternfly-bootstrap-treeview@2.1.10/dist/bootstrap-treeview.min.js"></script>
 <script>
 	var submitHandler = function() {
-		var form = document.querySelector("form");
-		form.submit();
+		var projects = Array.from(document.querySelectorAll('.tp-proj')).map(p => +p.id);
+		var suits = Array.from(document.querySelectorAll('.tp-suit')).map(s => +s.id);
+		var cases = Array.from(document.querySelectorAll('.tp-case')).map(c => +c.id);
+
+		myform.proj.value = JSON.stringify(projects);
+		myform.suit.value = JSON.stringify(suits);
+		myform.tc.value = JSON.stringify(cases);
+
+		myform.submit();
 	};
+
+	$(function() {
+		$('#tree').treeview({
+		  data: {{ structure|safe }},
+		  levels: 3,
+		  expandIcon: "fa fa-plus",
+		  collapseIcon: "fa fa-minus",
+		});
+	});
+
 </script>
 	<div class="plan-wrapper">
 		{% if user.is_authenticated %}
@@ -16,9 +42,9 @@
 			{% endif %}
 
 			{% if plan and plan.pk %}
-			<form action="{% url 'plan_update' pk=plan.pk %}" method="post">
+			<form action="{% url 'plan_update' pk=plan.pk %}" method="post" id="myform">
 			{% else %}
-			<form action="{% url 'plan_create' %}" method="post">
+			<form action="{% url 'plan_create' %}" method="post" id="myform">
 			{% endif %}
 
 
@@ -26,9 +52,11 @@
 			{% csrf_token %}
 				<input name="user_id" value="{{ user_id }}" class="invisible"/>
 				<input name="modified_by_id" value="{{ modified_by_id }}" class="invisible"/>
-				<input name="structure" class="invisible" value="[]"/>
+				<input name="proj" class="invisible"/>
+				<input name="suit" class="invisible"/>
+				<input name="tc" class="invisible"/>
 				<p>
-					<label for="TPName">Test-case name</label>
+					<label for="TPName">Test-plan name</label>
 					<input name="name" id="TPName" value="{{ name }}"/>
 				</p>
 				<p>
@@ -42,20 +70,7 @@
 				</select>
 			</form>
 			</form>
-			<table class="table">
-				<thead>
-					<tr>
-						<th>Name</th>
-					</tr>
-				</thead>
-				<tbody>
-					{% for proj in structure %}
-						<tr>
-							<td>{{ proj.name }}</td>
-						</tr>
-					{% endfor %}
-				</tbody>
-			</table>
+			<div id="tree"></div>
 			<button class="btn btn-success" type="button" data-bs-toggle="modal" data-bs-target="#saveModal">Save</button>
 				<div class="modal fade" id="saveModal" tabindex="-1" aria-labelledby="saveModalLabel" aria-hidden="true">
 				  <div class="modal-dialog">
