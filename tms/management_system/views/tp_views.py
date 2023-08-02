@@ -1,6 +1,7 @@
 import json
 
 from django.contrib import messages
+from django.http import HttpResponse
 from django.shortcuts import redirect, get_object_or_404
 from django.urls import reverse_lazy
 from django.views.generic import ListView, CreateView, UpdateView
@@ -89,6 +90,7 @@ class PlanEditView(UpdateView):
                     "text": p.name,
                     "icon": "fa-regular fa-folder",
                     "class": "tp-proj",
+                    "checkable": "true",
                     "nodes": suits}
             structure.append(proj)
         context["structure"] = json.dumps(structure)
@@ -106,3 +108,11 @@ class PlanEditView(UpdateView):
     def form_invalid(self, form):
         messages.error(self.request, form.errors)
         return self.render_to_response(self.get_context_data(form=form))
+
+
+def get_projects_to_add(request):
+    raw_projects = list(Project.objects.all())
+    mapped_projects = map(lambda item: {"id": item.id, "name": item.name}, raw_projects)
+    return HttpResponse(json.dumps(list(mapped_projects)))
+
+
