@@ -5,22 +5,6 @@
 {% endblock %}
 
 {% block content %}
-	<style>
-		.cards-wrapper {
-			margin: 0 1.5rem 1.5rem 1.5rem;
-		}
-
-        .project-card {
-        	padding-top: calc(var(--bs-gutter-x) * .5);
-        	padding-right: calc(var(--bs-gutter-x) * 1);
-        	padding-bottom: calc(var(--bs-gutter-x) * .5);
-        	padding-left: 0;
-        }
-
-		.page {
-			margin: 1rem 0;
-		}
-	</style>
 	<div class="btn-toolbar" role="toolbar">
 		<a href="{% url 'project_create' %}" class="btn btn-secondary">
 			New project
@@ -28,7 +12,7 @@
 	</div>
     <div class="row cards-wrapper">
 		{% for project in projects %}
-		<div class="col-sm-6 col-md-4 col-lg-3 project-card">
+		<div class="col-sm-6 col-md-4 col-lg-3 object-card">
 			<div class="card">
 				<div class="card-body">
 					<div class="card-title">

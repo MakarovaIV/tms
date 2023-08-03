@@ -34,15 +34,62 @@
             border-radius: 100%;
         }
 
+		.cards-wrapper {
+			margin: 0 1.5rem 1.5rem 1.5rem;
+		}
+
+        .object-card {
+        	padding-top: calc(var(--bs-gutter-x) * .5);
+        	padding-right: calc(var(--bs-gutter-x) * 1);
+        	padding-bottom: calc(var(--bs-gutter-x) * .5);
+        	padding-left: 0;
+        }
+
         .btn-toolbar {
 			gap: 1.5rem;
 			padding: 1.5rem;
         }
 
+        .grid-toolbar {
+			gap: 1.5rem;
+			padding: 0.5rem 0.5rem 0.5rem 0;
+        }
+
+		.page {
+			margin: 1rem 0;
+		}
+
         .msg {
         	width: 80%;
     		margin: 1rem auto;
         }
+
+		.invisible {
+			display:none
+		}
+
+		.form-wrapper {
+			display: flex;
+			flex-direction: column;
+			align-items: start;
+			flex-grow: 1;
+    		margin: 1rem;
+		}
+
+		.field-wrapper {
+			display: grid;
+			grid-template-columns: 25% 75%;
+			grid-gap: 2rem;
+		}
+
+		.form-with-fields {
+			width: 50%;
+		}
+
+		.bootstrap-table {
+			width: 100%;
+			margin-bottom: 1rem;
+		}
     </style>
 </head>
 <body>

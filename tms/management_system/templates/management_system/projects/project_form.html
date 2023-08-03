@@ -1,40 +1,28 @@
 {% extends 'root.html' %}
 
 {% block content %}
-<style>
-    .invisible {
-        display:none
-    }
-
-	.proj-wrapper {
-		display: flex;
-		flex-direction: column;
-		align-items: start;
-		flex-grow: 1;
-	}
-</style>
-	<div class="proj-wrapper">
+	<div class="form-wrapper">
 		{% if user.is_authenticated %}
 
 
 			{% if project and project.pk %}
-			<form action="{% url 'project_update' pk=project.pk %}" method="post">
+			<form class="form-with-fields" action="{% url 'project_update' pk=project.pk %}" method="post">
 
 				<h3>Edit project</h3>
 			{% else %}
-			<form action="{% url 'project_create' %}" method="post">
+			<form class="form-with-fields" action="{% url 'project_create' %}" method="post">
 				<h3>Create new project</h3>
 			{% endif %}
 
 			{% csrf_token %}
-				<input name="user_id" value="{{ user_id }}" class="invisible"/>
-				<p>
+				<input class="form-control" name="user_id" value="{{ user_id }}" class="invisible"/>
+				<p class="field-wrapper">
 					<label for="ProjName">Project name</label>
-					<input name="name" id="ProjName" value="{{ name }}"/>
+					<input class="form-control" name="name" id="ProjName" value="{{ name }}"/>
 				</p>
-				<p>
+				<p class="field-wrapper">
 					<label for="Desc">Description</label>
-					<textarea name="desc" id="Desc">{{ desc }}</textarea>
+					<textarea class="form-control" name="desc" id="Desc">{{ desc }}</textarea>
 				</p>
 				<button class="btn btn-success" type="submit">Create</button>
 			</form>

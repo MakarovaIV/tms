@@ -197,7 +197,7 @@
 		tree.bootstrapTable({
 			data: {{ structure|safe }},
 			idField: "uniqueId",
-			showColumns: true,
+			showColumns: false,
 			treeShowField: 'name',
 			parentIdField: 'parentId',
 			rowStyle :  function(row, index) {
@@ -235,7 +235,7 @@
 	});
 
 </script>
-	<div class="plan-wrapper">
+	<div class="form-wrapper">
 		{% if user.is_authenticated %}
 			{% if plan and plan.pk %}
 			<h3>Edit test-plan</h3>
@@ -244,9 +244,9 @@
 			{% endif %}
 
 			{% if plan and plan.pk %}
-			<form action="{% url 'plan_update' pk=plan.pk %}" method="post" id="myform">
+			<form class="form-with-fields" action="{% url 'plan_update' pk=plan.pk %}" method="post" id="myform">
 			{% else %}
-			<form action="{% url 'plan_create' %}" method="post" id="myform">
+			<form class="form-with-fields" action="{% url 'plan_create' %}" method="post" id="myform">
 			{% endif %}
 
 
@@ -257,22 +257,25 @@
 				<input name="proj" class="invisible"/>
 				<input name="suit" class="invisible"/>
 				<input name="tc" class="invisible"/>
-				<p>
+				<p class="field-wrapper">
 					<label for="TPName">Test-plan name</label>
-					<input name="name" id="TPName" value="{{ name }}"/>
+					<input class="form-control" name="name" id="TPName" value="{{ name }}"/>
 				</p>
-				<p>
+				<p class="field-wrapper">
 					<label for="Desc">Description</label>
-					<textarea name="desc" id="Desc">{{ desc }}</textarea>
+					<textarea class="form-control" name="desc" id="Desc">{{ desc }}</textarea>
 				</p>
-				<select name="status">
-					<option {% if 'IN PROGRESS' == status %} selected {% endif %}>IN PROGRESS</option>
-					<option {% if 'DONE' == status %} selected {% endif %}>DONE</option>
-					<option {% if 'CANCELLED' == status %} selected {% endif %}>CANCELLED</option>
-				</select>
+				<p class="field-wrapper">
+					<label for="Status">Status</label>
+					<select class="form-select form-select-md mb-3" name="status" id="Status">
+						<option {% if 'IN PROGRESS' == status %} selected {% endif %}>IN PROGRESS</option>
+						<option {% if 'DONE' == status %} selected {% endif %}>DONE</option>
+						<option {% if 'CANCELLED' == status %} selected {% endif %}>CANCELLED</option>
+					</select>
+				</p>
 			</form>
 			</form>
-			<div class="btn-toolbar">
+			<div class="grid-toolbar">
 				<button id="addProjectBtn" class="btn btn-success" type="button" onclick="onAddProjectModalOpen()">Add Project</button>
 				<button id="removeItemsBtn" class="btn btn-danger" type="button" onclick="removeHandler()">Remove selected</button>
 			</div>

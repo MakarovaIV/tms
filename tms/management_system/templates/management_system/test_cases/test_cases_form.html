@@ -2,20 +2,11 @@
 
 {% block content %}
 <style>
-    .invisible {
-        display:none
-    }
-
-	.proj-wrapper {
-		display: flex;
-		flex-direction: column;
-		align-items: start;
-		flex-grow: 1;
-	}
-
 	.steps-wrapper {
 		display: flex;
 		flex-direction: column;
+		width: 100%;
+		margin-bottom: 1rem;
 	}
 
 	.step {
@@ -24,6 +15,16 @@
 		gap: 1rem;
 		margin-top: 1rem;
 	}
+
+	.row {
+		width: 100%;
+		margin-bottom: 1rem;
+	}
+
+	form {
+		width: 100%;
+	}
+
 </style>
 <script>
 	var submitHandler = function() {
@@ -68,12 +69,14 @@
 
 		var stepName = document.createElement("textarea");
 		stepName.name = "step_name";
+		stepName.classList.add("form-control");
 		if (name != null) {
 			stepName.innerText = name;
 		}
 
 		var stepValue = document.createElement("textarea");
 		stepValue.name = "step_value";
+		stepValue.classList.add("form-control");
 		if (value != null) {
 			stepValue.innerText = value;
 		}
@@ -82,13 +85,13 @@
 		delBtn.type = "button";
 		delBtn.onclick= delStep;
 		delBtn.classList.add("btn", "btn-danger");
-		delBtn.innerText = "Delete step";
+		delBtn.innerText = "Delete";
 
 		var copyBtn = document.createElement("button");
 		copyBtn.type = "button";
 		copyBtn.onclick= copyStep;
 		copyBtn.classList.add("btn", "btn-secondary");
-		copyBtn.innerText = "Copy step";
+		copyBtn.innerText = "Copy";
 
 		step.appendChild(label);
 		step.appendChild(stepName);
@@ -120,66 +123,77 @@
 		updateIndexes();
 	};
 </script>
-	<div class="proj-wrapper">
+	<div class="form-wrapper">
 		{% if user.is_authenticated %}
-			{% if tc and tc.pk %}
-			<h3>Edit test-case</h3>
-			{% else %}
-			<h3>Create new test-case</h3>
-			{% endif %}
-
+			<div class="row">
+				{% if tc and tc.pk %}
+				<h3 class="col-sm-6">Edit test-case</h3>
+				{% else %}
+				<h3 class="col-sm-6">Create new test-case</h3>
+				{% endif %}
+				<a class="btn btn-success col-sm-2" href="{% url 'tc_history' proj_id=proj_id suit_id=suit_id pk=tc.pk %}">Show history</a>
+			</div>
 			{% if tc and tc.pk %}
 			<form action="{% url 'tc_update' proj_id=proj_id suit_id=suit_id pk=tc.pk %}" method="post">
 			{% else %}
-			<form action="{% url 'tc_create' proj_id=proj_id suit_id=suit_id %}" method="post">
+			<form  action="{% url 'tc_create' proj_id=proj_id suit_id=suit_id %}" method="post">
 			{% endif %}
 
 			{% csrf_token %}
-				<input name="user_id" value="{{ user_id }}" class="invisible"/>
-				<input name="proj_id" value="{{ proj_id }}" class="invisible"/>
-				<input name="suit_id" value="{{ suit_id }}" class="invisible"/>
-				<input name="steps" class="invisible"/>
-				<p>
-					<label for="TCName">Test-case name</label>
-					<input name="name" id="TCName" value="{{ name }}"/>
-				</p>
-				{% if tc and tc.pk %}
-					<p>
-						<label>Created by: {{ tc.user.username }}</label>
+				<div class="form-with-fields">
+					<input name="user_id" value="{{ user_id }}" class="invisible"/>
+					<input name="proj_id" value="{{ proj_id }}" class="invisible"/>
+					<input name="suit_id" value="{{ suit_id }}" class="invisible"/>
+					<input name="steps" class="invisible"/>
+					<p class="field-wrapper">
+						<label for="TCName">Test-case name</label>
+						<input class="form-control" name="name" id="TCName" value="{{ name }}"/>
 					</p>
-					<p>
-						<label>Modified by: {{ modified_by.username }}</label>
-					</p>
-					<p>
-						<label>Creation date: {{ tc.creation_date }}</label>
-					</p>
-					<p>
-						<label>Modification date: {{ tc.modification_date }}</label>
-					</p>
-					<a class="btn btn-success" href="{% url 'tc_history' proj_id=proj_id suit_id=suit_id pk=tc.pk %}">Show history</a>
-				{% endif %}
+					{% if tc and tc.pk %}
+						<p class="field-wrapper">
+							<label>Created by: </label>
+							<label>{{ tc.user.username }}</label>
+						</p>
+						<p class="field-wrapper">
+							<label>Modified by: </label>
+							<label>{{ modified_by.username }}</label>
+						</p>
+						<p class="field-wrapper">
+							<label>Creation date: </label>
+							<label>{{ tc.creation_date }}</label>
+						</p>
+						<p class="field-wrapper">
+							<label>Modification date: </label>
+							<label>{{ tc.modification_date }}</label>
+						</p>
+					{% endif %}
 
-				<p>
-					<label for="Desc">Description</label>
-					<textarea name="desc" id="Desc">{{ desc }}</textarea>
-				</p>
+					<p class="field-wrapper">
+						<label for="Desc">Description</label>
+						<textarea class="form-control" name="desc" id="Desc">{{ desc }}</textarea>
+					</p>
+					<p class="field-wrapper">
+						<label for="Status">Status</label>
+						<select class="form-select form-select-md mb-3" name="status" id="Status">
+							<option {% if 'DRAFT' == status %} selected {% endif %}>DRAFT</option>
+							<option {% if 'ACTIVE' == status %} selected {% endif %}>ACTIVE</option>
+							<option {% if 'OUTDATED' == status %} selected {% endif %}>OUTDATED</option>
+						</select>
+					</p>
+
+				</div>
 				<button class="btn btn-success" onclick="addStep()" type="button">Add step</button>
 				<div class="steps-wrapper" id="stepsWrapper">
 					{% for step in steps %}
 						<div class="step" data-index="{{ step.index }}">
 							<p class="step_number">{{ step.index }}</p>
-							<textarea name="step_name" data-index="{{ step.index }}">{{ step.step_name }}</textarea>
-							<textarea name="step_value" data-index="{{ step.index }}">{{ step.step_value }}</textarea>
-							<button class="btn btn-danger" onclick="delStep(event)" type="button" data-index="{{ step.index }}">Delete step</button>
-							<button class="btn btn-secondary" onclick="copyStep(event)" type="button" data-index="{{ step.index }}">Copy step</button>
+							<textarea class="form-control" name="step_name" data-index="{{ step.index }}">{{ step.step_name }}</textarea>
+							<textarea class="form-control" name="step_value" data-index="{{ step.index }}">{{ step.step_value }}</textarea>
+							<button class="btn btn-danger" onclick="delStep(event)" type="button" data-index="{{ step.index }}">Delete</button>
+							<button class="btn btn-secondary" onclick="copyStep(event)" type="button" data-index="{{ step.index }}">Copy</button>
 						</div>
 					{% endfor %}
 				</div>
-				<select name="status">
-					<option {% if 'DRAFT' == status %} selected {% endif %}>DRAFT</option>
-					<option {% if 'ACTIVE' == status %} selected {% endif %}>ACTIVE</option>
-					<option {% if 'OUTDATED' == status %} selected {% endif %}>OUTDATED</option>
-				</select>
 			</form>
 			</form>
 

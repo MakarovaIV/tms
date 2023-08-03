@@ -1,37 +1,25 @@
 {% extends 'root.html' %}
 
 {% block content %}
-<style>
-    .invisible {
-        display:none
-    }
-
-	.proj-wrapper {
-		display: flex;
-		flex-direction: column;
-		align-items: start;
-		flex-grow: 1;
-	}
-</style>
-	<div class="proj-wrapper">
+	<div class="form-wrapper">
 		{% if user.is_authenticated %}
 			{% if suit and suit.pk %}
-			<form action="{% url 'suit_update' proj_id=proj_id pk=suit.pk %}" method="post">
+			<form class="form-with-fields" action="{% url 'suit_update' proj_id=proj_id pk=suit.pk %}" method="post">
 				<h3>Edit suit</h3>
 			{% else %}
-			<form action="{% url 'suit_create' proj_id=proj_id %}" method="post">
+			<form class="form-with-fields" action="{% url 'suit_create' proj_id=proj_id %}" method="post">
 				<h3>Create new suit</h3>
 			{% endif %}
 
 			{% csrf_token %}
-				<input name="user_id" value="{{ user_id }}" class="invisible"/>
-				<p>
+				<input class="form-control" name="user_id" value="{{ user_id }}" class="invisible"/>
+				<p class="field-wrapper">
 					<label for="SuitName">Suit name</label>
-					<input name="name" id="SuitName" value="{{ name }}"/>
+					<input class="form-control" name="name" id="SuitName" value="{{ name }}"/>
 				</p>
-				<p>
+				<p class="field-wrapper">
 					<label for="Desc">Description</label>
-					<textarea name="desc" id="Desc">{{ desc }}</textarea>
+					<textarea class="form-control" name="desc" id="Desc">{{ desc }}</textarea>
 				</p>
 				<button class="btn btn-success" type="submit">Create</button>
 			</form>
