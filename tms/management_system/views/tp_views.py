@@ -69,30 +69,25 @@ class PlanEditView(UpdateView):
         projects = list(plan.proj.all())
         structure = []
         for p in projects:
+            button_add_suit = '<button type="button" class="btn btn-info" onclick="addSuitHandler(event,' + str(p.id) + ')">Add suit</button>'
+            structure.append({"id": p.id,
+                              "name": p.name,
+                              "type": "tp-proj",
+                              "action": button_add_suit})
             suits_in_project = list(plan.suit.filter(proj_id=p.id))
-            suits = []
             for s in suits_in_project:
+                button_add_case = '<button type="button" class="btn btn-info" onclick="addCaseHandler(event,' + str(s.id) + ')">Add case</button>'
+                structure.append({"id": s.id,
+                                  "name": s.name,
+                                  "parentId": p.id,
+                                  "type": "tp-suit",
+                                  "action": button_add_case})
                 cases_in_suit = list(plan.tc.filter(suit_id=s.id, proj_id=p.id))
-                cases = []
                 for c in cases_in_suit:
-                    case = {"id": c.id,
-                            "text": c.name,
-                            "icon": "fa-regular fa-file",
-                            "class": "tp-case"}
-                    cases.append(case)
-                suit = {"id": s.id,
-                        "text": s.name,
-                        "icon": "fa-solid fa-list",
-                        "class": "tp-suit",
-                        "nodes": cases}
-                suits.append(suit)
-            proj = {"id": p.id,
-                    "text": p.name,
-                    "icon": "fa-regular fa-folder",
-                    "class": "tp-proj",
-                    "checkable": "true",
-                    "nodes": suits}
-            structure.append(proj)
+                    structure.append({"id": c.id,
+                                      "text": c.name,
+                                      "parentId": s.id,
+                                      "type": "tp-case"})
         context["structure"] = json.dumps(structure)
         context["name"] = plan.name
         context["desc"] = plan.desc
