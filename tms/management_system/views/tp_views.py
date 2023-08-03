@@ -42,7 +42,7 @@ class PlanCreateView(CreateView):
         return super(PlanCreateView, self).form_valid(form)
 
     def form_invalid(self, form):
-        messages.error(self.request, form.errors['status'][0])
+        messages.error(self.request, form.errors)
         return self.render_to_response(self.get_context_data(form=form))
 
 

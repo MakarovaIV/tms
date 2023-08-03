@@ -80,7 +80,7 @@ class TestCaseCreateView(CreateView):
         return super(TestCaseCreateView, self).form_valid(form)
 
     def form_invalid(self, form):
-        messages.error(self.request, "Form is invalid")
+        messages.error(self.request, form.errors)
         return self.render_to_response(self.get_context_data(form=form))
 
 
@@ -137,6 +137,10 @@ class TestCaseUpdate(UpdateView):
                                  tc_id=tc_id,
                                  user_id=user_id)
         return super(TestCaseUpdate, self).form_valid(form)
+
+    def form_invalid(self, form):
+        messages.error(self.request, form.errors)
+        return self.render_to_response(self.get_context_data(form=form))
 
 
 def delete_test_case(request, proj_id, suit_id, pk):

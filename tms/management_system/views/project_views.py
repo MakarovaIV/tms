@@ -1,3 +1,4 @@
+from django.contrib import messages
 from django.shortcuts import redirect, get_object_or_404
 from django.urls import reverse_lazy
 from django.views.generic import ListView, CreateView, UpdateView
@@ -31,6 +32,10 @@ class ProjectCreateView(CreateView):
         form.save()
         return super(ProjectCreateView, self).form_valid(form)
 
+    def form_invalid(self, form):
+        messages.error(self.request, form.errors)
+        return self.render_to_response(self.get_context_data(form=form))
+
 
 class ProjectEditView(UpdateView):
     model = Project
@@ -54,6 +59,10 @@ class ProjectEditView(UpdateView):
         form.instance.user = self.request.user
         form.save()
         return super(ProjectEditView, self).form_valid(form)
+
+    def form_invalid(self, form):
+        messages.error(self.request, form.errors)
+        return self.render_to_response(self.get_context_data(form=form))
 
 
 def delete_project(request, pk):

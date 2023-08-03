@@ -1,3 +1,4 @@
+from django.contrib import messages
 from django.shortcuts import redirect, get_object_or_404
 from django.urls import reverse_lazy
 from django.views.generic import ListView, CreateView, UpdateView
@@ -50,6 +51,10 @@ class SuitCreateView(CreateView):
         form.save()
         return super(SuitCreateView, self).form_valid(form)
 
+    def form_invalid(self, form):
+        messages.error(self.request, form.errors)
+        return self.render_to_response(self.get_context_data(form=form))
+
 
 class SuitEditView(UpdateView):
     model = Suit
@@ -79,6 +84,10 @@ class SuitEditView(UpdateView):
         form.instance.proj = project
         form.save()
         return super(SuitEditView, self).form_valid(form)
+
+    def form_invalid(self, form):
+        messages.error(self.request, form.errors)
+        return self.render_to_response(self.get_context_data(form=form))
 
 
 def delete_suit(request, proj_id, pk):
