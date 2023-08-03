@@ -69,25 +69,29 @@ class PlanEditView(UpdateView):
         projects = list(plan.proj.all())
         structure = []
         for p in projects:
-            button_add_suit = '<button type="button" class="btn btn-info" onclick="addSuitHandler(event,' + str(p.id) + ')">Add suit</button>'
+            button_add_suit = '<button type="button" class="btn btn-info" onclick="onAddSuitModalOpen(event,' + str(p.id) + ')">Add suit</button>'
             structure.append({"id": p.id,
                               "name": p.name,
                               "type": "tp-proj",
+                              "uniqueId": "proj_" + str(p.id),
                               "action": button_add_suit})
             suits_in_project = list(plan.suit.filter(proj_id=p.id))
             for s in suits_in_project:
-                button_add_case = '<button type="button" class="btn btn-info" onclick="addCaseHandler(event,' + str(s.id) + ')">Add case</button>'
+                button_add_case = '<button type="button" class="btn btn-info" onclick="onAddCaseModalOpen(event,' + str(s.id) + ')">Add case</button>'
                 structure.append({"id": s.id,
                                   "name": s.name,
-                                  "parentId": p.id,
+                                  "parentId": "proj_" + str(p.id),
                                   "type": "tp-suit",
+                                  "uniqueId": "suit_" + str(s.id),
                                   "action": button_add_case})
                 cases_in_suit = list(plan.tc.filter(suit_id=s.id, proj_id=p.id))
                 for c in cases_in_suit:
                     structure.append({"id": c.id,
-                                      "text": c.name,
-                                      "parentId": s.id,
-                                      "type": "tp-case"})
+                                      "name": c.name,
+                                      "parentId": "suit_" + str(s.id),
+                                      "uniqueId": "case_" + str(c.id),
+                                      "type": "tp-case",
+                                      "action": c.desc})
         context["structure"] = json.dumps(structure)
         context["name"] = plan.name
         context["desc"] = plan.desc
@@ -111,3 +115,22 @@ def get_projects_to_add(request):
     return HttpResponse(json.dumps(list(mapped_projects)))
 
 
+def get_suits_to_add(request):
+    proj_id = request.GET.get('projectid', '')
+    mapped_suits = []
+    if proj_id:
+        raw_suits = list(Suit.objects.filter(proj_id=proj_id))
+        mapped_suits = list(map(lambda item: {"id": item.id, "name": item.name, "parentId": item.proj_id}, raw_suits))
+    return HttpResponse(json.dumps(mapped_suits))
+
+
+def get_cases_to_add(request):
+    suit_id = request.GET.get('suitid', '')
+    mapped_cases = []
+    if suit_id:
+        raw_suits = list(TC.objects.filter(suit_id=suit_id))
+        mapped_cases = list(map(lambda item: {"id": item.id,
+                                              "name": item.name,
+                                              "desc": item.desc,
+                                              "parentId": item.suit_id}, raw_suits))
+    return HttpResponse(json.dumps(mapped_cases))

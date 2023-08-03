@@ -49,4 +49,6 @@ urlpatterns = [
     path('plan/delete/<int:pk>/', views.delete_test_plan, name='plan_del'),
     path('plan/update/<int:pk>/', views.PlanEditView.as_view(), name='plan_update'),
     path('plan/getprojects/', views.get_projects_to_add, name='getprojects'),
+    path('plan/getsuits/', views.get_suits_to_add, name='getsuits'),
+    path('plan/getcases/', views.get_cases_to_add, name='getcases'),
 ]

@@ -15,9 +15,22 @@
 <script src="https://unpkg.com/bootstrap-table@1.22.1/dist/extensions/treegrid/bootstrap-table-treegrid.min.js"></script>
 <script>
 	var submitHandler = function() {
-		var projects = Array.from(document.querySelectorAll('.tp-proj')).map(p => +p.querySelector('input').value);
-		var suits = Array.from(document.querySelectorAll('.tp-suit')).map(s => +s.querySelector('input').value);
-		var cases = Array.from(document.querySelectorAll('.tp-case')).map(c => +c.querySelector('input').value);
+		var tree = $('#tree');
+		var data = tree.bootstrapTable('getData');
+
+		var projects = []
+		var suits = []
+		var cases = []
+
+		data.forEach(item => {
+			if (item.type == 'tp-proj') {
+				projects.push(item.id)
+			} else if (item.type == 'tp-suit') {
+				suits.push(item.id)
+			} else if (item.type == 'tp-case') {
+				cases.push(item.id)
+			}
+		});
 
 		myform.proj.value = JSON.stringify(projects);
 		myform.suit.value = JSON.stringify(suits);
@@ -32,50 +45,158 @@
 			"id": p.id,
 			"name": p.name,
 			"type": "tp-proj",
-			"action": '<button type="button" class="btn btn-info" onclick="addSuitHandler(event,' + p.id + ')">Add suit</button>'
+			"uniqueId": "proj_" + p.id,
+			"action": '<button type="button" class="btn btn-info" onclick="onAddSuitModalOpen(event,' + p.id + ')">Add suit</button>'
 		}));
 		$('#tree').bootstrapTable('append', newNodes);
 		bootstrap.Modal.getInstance('#addProjectModal').hide()
 	};
 
 	var addSuitHandler = function() {
+		var modal = bootstrap.Modal.getInstance('#addSuitModal')
+		var projId = modal.projId;
+		var clickedBtn = modal.clickedBtn;
+		var selectedSuits = $('#addSuitTable').bootstrapTable('getSelections');
+		var tree = $('#tree');
+		var startIndex = +clickedBtn.parentNode.parentNode.dataset.index + 1;
+		selectedSuits.forEach(s => {
+			var node = {
+				"id": s.id,
+				"name": s.name,
+				"type": "tp-suit",
+				"parentId": "proj_" + projId,
+				"uniqueId": "suit_" + s.id,
+				"action": '<button type="button" class="btn btn-info" onclick="onAddCaseModalOpen(event,' + s.id + ')">Add case</button>'
+			};
+			tree.bootstrapTable('insertRow', {index: startIndex, row: node});
+			startIndex++;
+		});
+		bootstrap.Modal.getInstance('#addSuitModal').hide()
 	}
 
 	var addCaseHandler = function() {
+		var modal = bootstrap.Modal.getInstance('#addCaseModal')
+		var suitId = modal.suitId;
+		var clickedBtn = modal.clickedBtn;
+		var selectedCases = $('#addCaseTable').bootstrapTable('getSelections');
+		var tree = $('#tree');
+		var startIndex = +clickedBtn.parentNode.parentNode.dataset.index + 1;
+		selectedCases.forEach(c => {
+			var node = {
+				"id": c.id,
+				"name": c.name,
+				"type": "tp-case",
+				"parentId": "suit_" + suitId,
+				"uniqueId": "case_" + c.id,
+				"action": c.desc
+			};
+			tree.bootstrapTable('insertRow', {index: startIndex, row: node});
+			startIndex++;
+		});
+		bootstrap.Modal.getInstance('#addCaseModal').hide()
 	}
 
+	var addProjectTableInitialized = false;
 	var onAddProjectModalOpen = function() {
-		$('#addProjectTable').bootstrapTable({
-			url: "{% url 'getprojects' %}",
-			columns: [{
-				checkbox: true
-			}, {
-				field: 'id',
-				title: 'ID'
-			}, {
-				field: 'name',
-				title: 'Project Name'
-			}]
-		})
+		var modal = new bootstrap.Modal(addProjectModal, {});
+		modal.show();
+		if (addProjectTableInitialized == false) {
+			$('#addProjectTable').bootstrapTable({
+				url: "{% url 'getprojects' %}",
+				idField: "uniqueId",
+				columns: [{
+					checkbox: true
+				}, {
+					field: 'id',
+					title: 'ID'
+				}, {
+					field: 'name',
+					title: 'Project Name'
+				}]
+			})
+			addProjectTableInitialized = true;
+		} else {
+			$('#addProjectTable').bootstrapTable('refreshOptions', {
+				url: "{% url 'getprojects' %}",
+			});
+		}
 	};
+
+	var addSuitTableInitialized = false;
+	var onAddSuitModalOpen = function(event, projId) {
+		var modal = new bootstrap.Modal(addSuitModal, {});
+		modal.show();
+		modal.projId = projId;
+		modal.clickedBtn = event.target;
+		if (addSuitTableInitialized == false) {
+			$('#addSuitTable').bootstrapTable({
+				url: "{% url 'getsuits' %}" + "?projectid=" + projId,
+				idField: "uniqueId",
+				columns: [{
+					checkbox: true
+				}, {
+					field: 'id',
+					title: 'ID'
+				}, {
+					field: 'name',
+					title: 'Suit Name'
+				}]
+			});
+			addSuitTableInitialized = true;
+		} else {
+			$('#addSuitTable').bootstrapTable('refreshOptions', {
+				url: "{% url 'getsuits' %}" + "?projectid=" + projId,
+			});
+		}
+	};
+
+	var addCaseTableInitialized = false;
+	var onAddCaseModalOpen = function(event, suitId) {
+		var modal = new bootstrap.Modal(addCaseModal, {});
+		modal.show();
+		modal.suitId = suitId;
+		modal.clickedBtn = event.target;
+		if (addCaseTableInitialized == false) {
+			$('#addCaseTable').bootstrapTable({
+				url: "{% url 'getcases' %}" + "?suitid=" + suitId,
+				idField: "uniqueId",
+				columns: [{
+					checkbox: true
+				}, {
+					field: 'id',
+					title: 'ID'
+				}, {
+					field: 'name',
+					title: 'Case Name'
+				}, {
+					field: 'desc',
+					title: 'Description'
+				}]
+			});
+			addCaseTableInitialized = true;
+		} else {
+			$('#addCaseTable').bootstrapTable('refreshOptions', {
+				url: "{% url 'getcases' %}" + "?suitid=" + suitId,
+			});
+		}
+	};
+
 
 	var removeHandler = function() {
 		var selectedNodes = $('#tree').bootstrapTable('getSelections');
 		if (selectedNodes && selectedNodes.length > 0) {
 			$('#tree').bootstrapTable('remove', {
-				field: "id",
-				values: selectedNodes.map(n => n.id)
+				field: "uniqueId",
+				values: selectedNodes.map(n => n.uniqueId)
 			});
 		}
 	};
 
 	$(function() {
-		addProjectBtn.addEventListener('click', onAddProjectModalOpen);
 		var tree = $('#tree')
-		
 		tree.bootstrapTable({
 			data: {{ structure|safe }},
-			idField: "id",
+			idField: "uniqueId",
 			showColumns: true,
 			treeShowField: 'name',
 			parentIdField: 'parentId',
@@ -152,7 +273,7 @@
 			</form>
 			</form>
 			<div class="btn-toolbar">
-				<button id="addProjectBtn" class="btn btn-success" type="button" data-bs-toggle="modal" data-bs-target="#addProjectModal">Add Project</button>
+				<button id="addProjectBtn" class="btn btn-success" type="button" onclick="onAddProjectModalOpen()">Add Project</button>
 				<button id="removeItemsBtn" class="btn btn-danger" type="button" onclick="removeHandler()">Remove selected</button>
 			</div>
 			<table id="tree"></table>
@@ -170,6 +291,40 @@
 						<div class="modal-footer">
 							<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
 							<button type="button" class="btn btn-primary" onclick="addProjectHandler()">Add</button>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="modal fade" id="addSuitModal" tabindex="-1" aria-labelledby="addSuitModalLabel" aria-hidden="true">
+				<div class="modal-dialog">
+					<div class="modal-content">
+						<div class="modal-header">
+							<h5 class="modal-title" id="addSuitModalLabel">Add suit</h5>
+							<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+						</div>
+						<div class="modal-body">
+							<table id="addSuitTable"></table>
+						</div>
+						<div class="modal-footer">
+							<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+							<button type="button" class="btn btn-primary" onclick="addSuitHandler()">Add</button>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="modal fade" id="addCaseModal" tabindex="-1" aria-labelledby="addCaseModalLabel" aria-hidden="true">
+				<div class="modal-dialog">
+					<div class="modal-content">
+						<div class="modal-header">
+							<h5 class="modal-title" id="addCaseModalLabel">Add case</h5>
+							<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+						</div>
+						<div class="modal-body">
+							<table id="addCaseTable"></table>
+						</div>
+						<div class="modal-footer">
+							<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+							<button type="button" class="btn btn-primary" onclick="addCaseHandler()">Add</button>
 						</div>
 					</div>
 				</div>
