@@ -1,10 +1,8 @@
 from django.db import models
 
-from . import TC
 from .custom_user import CustomUser
 from .project import Project
 from .suit import Suit
-from .test_case_in_test_plan import TCinTP
 
 TP_STATUS = [
     ("IN PROGRESS", "IN PROGRESS"),
@@ -27,7 +25,6 @@ class TP(models.Model):
     modified_by = models.IntegerField()
     proj = models.ManyToManyField(Project)
     suit = models.ManyToManyField(Suit)
-    tc = models.ManyToManyField(TC)
     status = models.CharField(choices=TP_STATUS, default="IN PROGRESS", null=True)
     creation_date = models.DateTimeField(auto_now_add=True)
     modification_date = models.DateTimeField(auto_now=True)
@@ -37,7 +34,6 @@ class TP(models.Model):
                f'{self.desc} ' \
                f'{self.user} ' \
                f'{self.modified_by} ' \
-               f'{self.tc} ' \
                f'{self.proj} ' \
                f'{self.suit} ' \
                f'{self.status} ' \

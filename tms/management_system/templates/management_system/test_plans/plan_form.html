@@ -28,7 +28,11 @@
 			} else if (item.type == 'tp-suit') {
 				suits.push(item.id)
 			} else if (item.type == 'tp-case') {
-				cases.push(item.id)
+				cases.push({
+					id: item.id,
+					tc_status: item.tc_status || "IN PROGRESS",
+					assignee: item.assignee || null,
+				})
 			}
 		});
 
@@ -39,14 +43,23 @@
 		myform.submit();
 	};
 
+	var filterExistingItems = function(type) {
+		var tree = $('#tree');
+		var rows = tree.bootstrapTable('getData');
+		rows = rows.filter(r => r.type == type);
+		var existingItems = {};
+		rows.forEach(r => existingItems[r.id] = r.id);
+		return existingItems;
+	};
+
 	var addProjectHandler = function() {
 		var selectedProjects = $('#addProjectTable').bootstrapTable('getSelections');
-		var newNodes = selectedProjects.map(p => ({
+		var existingItems = filterExistingItems('tp-proj');
+		var newNodes = selectedProjects.filter(p => !existingItems[p.id]).map(p => ({
 			"id": p.id,
 			"name": p.name,
 			"type": "tp-proj",
-			"uniqueId": "proj_" + p.id,
-			"action": '<button type="button" class="btn btn-info" onclick="onAddSuitModalOpen(event,' + p.id + ')">Add suit</button>'
+			"uniqueId": "proj_" + p.id
 		}));
 		$('#tree').bootstrapTable('append', newNodes);
 		bootstrap.Modal.getInstance('#addProjectModal').hide()
@@ -59,17 +72,19 @@
 		var selectedSuits = $('#addSuitTable').bootstrapTable('getSelections');
 		var tree = $('#tree');
 		var startIndex = +clickedBtn.parentNode.parentNode.dataset.index + 1;
+		var existingItems = filterExistingItems('tp-suit');
 		selectedSuits.forEach(s => {
-			var node = {
-				"id": s.id,
-				"name": s.name,
-				"type": "tp-suit",
-				"parentId": "proj_" + projId,
-				"uniqueId": "suit_" + s.id,
-				"action": '<button type="button" class="btn btn-info" onclick="onAddCaseModalOpen(event,' + s.id + ')">Add case</button>'
-			};
-			tree.bootstrapTable('insertRow', {index: startIndex, row: node});
-			startIndex++;
+			if (!existingItems[s.id]) {
+				var node = {
+					"id": s.id,
+					"name": s.name,
+					"type": "tp-suit",
+					"parentId": "proj_" + projId,
+					"uniqueId": "suit_" + s.id
+				};
+				tree.bootstrapTable('insertRow', {index: startIndex, row: node});
+				startIndex++;
+			}
 		});
 		bootstrap.Modal.getInstance('#addSuitModal').hide()
 	}
@@ -81,17 +96,20 @@
 		var selectedCases = $('#addCaseTable').bootstrapTable('getSelections');
 		var tree = $('#tree');
 		var startIndex = +clickedBtn.parentNode.parentNode.dataset.index + 1;
+		var existingItems = filterExistingItems('tp-case');
 		selectedCases.forEach(c => {
-			var node = {
-				"id": c.id,
-				"name": c.name,
-				"type": "tp-case",
-				"parentId": "suit_" + suitId,
-				"uniqueId": "case_" + c.id,
-				"action": c.desc
-			};
-			tree.bootstrapTable('insertRow', {index: startIndex, row: node});
-			startIndex++;
+			if (!existingItems[c.id]) {
+				var node = {
+					"id": c.id,
+					"name": c.name,
+					"type": "tp-case",
+					"parentId": "suit_" + suitId,
+					"uniqueId": "case_" + c.id,
+					"desc": c.desc
+				};
+				tree.bootstrapTable('insertRow', {index: startIndex, row: node});
+				startIndex++;
+			}
 		});
 		bootstrap.Modal.getInstance('#addCaseModal').hide()
 	}
@@ -192,6 +210,26 @@
 		}
 	};
 
+	var onAssigneeChange = function(event, uniqueId) {
+		var tree = $('#tree');
+		var index = event.target.parentNode.parentNode.dataset.index;
+		var row = tree.bootstrapTable('getData').find(item => item.uniqueId == uniqueId);
+		if (row) {
+			row.assignee = event.target.value;
+			tree.bootstrapTable('updateRow', {index, row});
+		}
+	};
+
+	var onTCStatusChange = function(event, uniqueId) {
+		var tree = $('#tree');
+		var index = event.target.parentNode.parentNode.dataset.index;
+		var row = tree.bootstrapTable('getData').find(item => item.uniqueId == uniqueId);
+		if (row) {
+			row.tc_status = event.target.value;
+			tree.bootstrapTable('updateRow', {index, row});
+		}
+	};
+
 	$(function() {
 		var tree = $('#tree')
 		tree.bootstrapTable({
@@ -215,9 +253,34 @@
 					title: "Name"
 				},
 				{
+					field: "desc",
+					title: " ",
+					formatter: function(value, row) {
+						if (row.type == "tp-proj") {
+							return `<button type="button" class="btn btn-info" onclick="onAddSuitModalOpen(event, ${row.id})">Add suit</button>`
+						} else if (row.type == "tp-suit") {
+							return `<button type="button" class="btn btn-info" onclick="onAddCaseModalOpen(event, ${row.id})">Add case</button>`
+						} else if (row.type == "tp-case") {
+							return `<input class="form-control"  type="text" value="${row.assignee || ''}" onchange="onAssigneeChange(event, '${row.uniqueId}')"></input>`
+						}
+					}
+				},
+				{
 					field: "action",
-					title: " "
-				}
+					title: " ",
+					formatter: function(value, row) {
+						if (row.type == "tp-case") {
+							return `<select class="form-select form-select-md" name="tc_status" id="Status" onchange="onTCStatusChange(event, '${row.uniqueId}')">
+								<option ${'IN PROGRESS' == row.tc_status ? "selected" : ""}>IN PROGRESS</option>
+								<option ${'SUCCEED' == row.tc_status ? "selected" : ""}>SUCCEED</option>
+								<option ${'FAILED' == row.tc_status ? "selected" : ""}>FAILED</option>
+								<option ${'SKIPPED' == row.tc_status ? "selected" : ""}>SKIPPED</option>
+							</select>`
+						} else {
+							return ""
+						}
+					}
+				},
 		  	],
 			onPostBody: function() {
 				var columns = tree.bootstrapTable('getOptions').columns

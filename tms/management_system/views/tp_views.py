@@ -8,6 +8,7 @@ from django.views.generic import ListView, CreateView, UpdateView
 
 from ..forms import TestPlanCreateForm
 from ..models import TP, Project, Suit, CustomUser, TC
+from ..models.test_case_in_test_plan import TCinTP
 
 
 class PlanView(ListView):
@@ -39,6 +40,12 @@ class PlanCreateView(CreateView):
         form.instance.user = self.request.user
         form.instance.modified_by = self.request.user.id
         form.save()
+        tcases = json.loads(form.data['tc'])
+        for tc in tcases:
+            TCinTP.objects.create(tc_status=tc['tc_status'],
+                                  assignee_id=tc['assignee'],
+                                  tc_id=tc['id'],
+                                  plan_id=form.instance.id)
         return super(PlanCreateView, self).form_valid(form)
 
     def form_invalid(self, form):
@@ -67,31 +74,29 @@ class PlanEditView(UpdateView):
         context["modified_by_id"] = self.request.user.id
         plan = get_object_or_404(TP, id=self.kwargs['pk'])
         projects = list(plan.proj.all())
+        tc_in_tp_list = list(TCinTP.objects.filter(plan_id=plan.id))
         structure = []
         for p in projects:
-            button_add_suit = '<button type="button" class="btn btn-info" onclick="onAddSuitModalOpen(event,' + str(p.id) + ')">Add suit</button>'
             structure.append({"id": p.id,
                               "name": p.name,
                               "type": "tp-proj",
-                              "uniqueId": "proj_" + str(p.id),
-                              "action": button_add_suit})
+                              "uniqueId": "proj_" + str(p.id)})
             suits_in_project = list(plan.suit.filter(proj_id=p.id))
             for s in suits_in_project:
-                button_add_case = '<button type="button" class="btn btn-info" onclick="onAddCaseModalOpen(event,' + str(s.id) + ')">Add case</button>'
                 structure.append({"id": s.id,
                                   "name": s.name,
                                   "parentId": "proj_" + str(p.id),
                                   "type": "tp-suit",
-                                  "uniqueId": "suit_" + str(s.id),
-                                  "action": button_add_case})
-                cases_in_suit = list(plan.tc.filter(suit_id=s.id, proj_id=p.id))
-                for c in cases_in_suit:
-                    structure.append({"id": c.id,
-                                      "name": c.name,
+                                  "uniqueId": "suit_" + str(s.id)})
+                for tc_in_tp in list(filter(lambda it: it.tc.suit_id == s.id, tc_in_tp_list)):
+                    structure.append({"id": tc_in_tp.tc.id,
+                                      "name": tc_in_tp.tc.name,
                                       "parentId": "suit_" + str(s.id),
-                                      "uniqueId": "case_" + str(c.id),
+                                      "uniqueId": "case_" + str(tc_in_tp.tc.id),
                                       "type": "tp-case",
-                                      "action": c.desc})
+                                      "assignee": tc_in_tp.assignee,
+                                      "tc_status": tc_in_tp.tc_status,
+                                      "desc": tc_in_tp.tc.desc})
         context["structure"] = json.dumps(structure)
         context["name"] = plan.name
         context["desc"] = plan.desc
@@ -102,6 +107,16 @@ class PlanEditView(UpdateView):
         form.instance.user = self.request.user
         form.instance.modified_by = self.request.user.id
         form.save()
+        TCinTP.objects.filter(plan_id=self.kwargs['pk']).delete()
+        tcases = json.loads(form.data['tc'])
+        existing_items = {}
+        for tc in tcases:
+            if tc['id'] not in existing_items:
+                existing_items[tc['id']] = tc['id']
+                TCinTP.objects.create(tc_status=tc['tc_status'],
+                                      assignee_id=tc['assignee'],
+                                      tc_id=tc['id'],
+                                      plan_id=form.instance.id)
         return super(PlanEditView, self).form_valid(form)
 
     def form_invalid(self, form):

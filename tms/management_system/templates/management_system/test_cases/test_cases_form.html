@@ -128,10 +128,10 @@
 			<div class="row">
 				{% if tc and tc.pk %}
 				<h3 class="col-sm-6">Edit test-case</h3>
+				<a class="btn btn-success col-sm-2" href="{% url 'tc_history' proj_id=proj_id suit_id=suit_id pk=tc.pk %}">Show history</a>
 				{% else %}
 				<h3 class="col-sm-6">Create new test-case</h3>
 				{% endif %}
-				<a class="btn btn-success col-sm-2" href="{% url 'tc_history' proj_id=proj_id suit_id=suit_id pk=tc.pk %}">Show history</a>
 			</div>
 			{% if tc and tc.pk %}
 			<form action="{% url 'tc_update' proj_id=proj_id suit_id=suit_id pk=tc.pk %}" method="post">

@@ -15,7 +15,7 @@
 			{% endif %}
 
 			{% csrf_token %}
-				<input class="form-control" name="user_id" value="{{ user_id }}" class="invisible"/>
+				<input name="user_id" value="{{ user_id }}" class="invisible"/>
 				<p class="field-wrapper">
 					<label for="ProjName">Project name</label>
 					<input class="form-control" name="name" id="ProjName" value="{{ name }}"/>
