@@ -94,7 +94,8 @@ class PlanEditView(UpdateView):
                                       "parentId": "suit_" + str(s.id),
                                       "uniqueId": "case_" + str(tc_in_tp.tc.id),
                                       "type": "tp-case",
-                                      "assignee": tc_in_tp.assignee,
+                                      "assignee": tc_in_tp.assignee.id if tc_in_tp.assignee else None,
+                                      "assigneeName": tc_in_tp.assignee.username if tc_in_tp.assignee else None,
                                       "tc_status": tc_in_tp.tc_status,
                                       "desc": tc_in_tp.tc.desc})
         context["structure"] = json.dumps(structure)
@@ -149,3 +150,15 @@ def get_cases_to_add(request):
                                               "desc": item.desc,
                                               "parentId": item.suit_id}, raw_suits))
     return HttpResponse(json.dumps(mapped_cases))
+
+
+def get_list_of_users(request):
+    inputs = request.GET.get('term', ' ')
+    results = []
+    list_of_users = CustomUser.objects.filter(username__contains=inputs)
+    for u in list_of_users:
+        results.append({"id": u.id,
+                        "text": u.username})
+    data = json.dumps({"results": results})
+    mimetype = "application/json"
+    return HttpResponse(data, mimetype)

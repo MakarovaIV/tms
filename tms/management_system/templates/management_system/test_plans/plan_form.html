@@ -8,11 +8,12 @@
 </style>
 <link href="https://cdn.jsdelivr.net/npm/jquery-treegrid@0.3.0/css/jquery.treegrid.css" rel="stylesheet">
 <link rel="stylesheet" href="https://unpkg.com/bootstrap-table@1.22.1/dist/bootstrap-table.min.css">
-<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"><link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 <script src="https://code.jquery.com/jquery-3.7.0.min.js" integrity="sha256-2Pmvv0kuTBOenSvLm6bvfBSSHrUJ+3A7x6P5Ebd07/g=" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/jquery-treegrid@0.3.0/js/jquery.treegrid.min.js"></script>
 <script src="https://unpkg.com/bootstrap-table@1.22.1/dist/bootstrap-table.min.js"></script>
 <script src="https://unpkg.com/bootstrap-table@1.22.1/dist/extensions/treegrid/bootstrap-table-treegrid.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script>
 	var submitHandler = function() {
 		var tree = $('#tree');
@@ -28,10 +29,12 @@
 			} else if (item.type == 'tp-suit') {
 				suits.push(item.id)
 			} else if (item.type == 'tp-case') {
+				var assigneeSelector = document.querySelector(`.assignee-selector[data-uniqueid="${item.uniqueId}"]`);
+				var statusSelector = document.querySelector(`.status-selector[data-uniqueid="${item.uniqueId}"]`);
 				cases.push({
 					id: item.id,
-					tc_status: item.tc_status || "IN PROGRESS",
-					assignee: item.assignee || null,
+					tc_status: statusSelector.value || "IN PROGRESS",
+					assignee: +assigneeSelector.value || null,
 				})
 			}
 		});
@@ -210,26 +213,6 @@
 		}
 	};
 
-	var onAssigneeChange = function(event, uniqueId) {
-		var tree = $('#tree');
-		var index = event.target.parentNode.parentNode.dataset.index;
-		var row = tree.bootstrapTable('getData').find(item => item.uniqueId == uniqueId);
-		if (row) {
-			row.assignee = event.target.value;
-			tree.bootstrapTable('updateRow', {index, row});
-		}
-	};
-
-	var onTCStatusChange = function(event, uniqueId) {
-		var tree = $('#tree');
-		var index = event.target.parentNode.parentNode.dataset.index;
-		var row = tree.bootstrapTable('getData').find(item => item.uniqueId == uniqueId);
-		if (row) {
-			row.tc_status = event.target.value;
-			tree.bootstrapTable('updateRow', {index, row});
-		}
-	};
-
 	$(function() {
 		var tree = $('#tree')
 		tree.bootstrapTable({
@@ -246,7 +229,9 @@
 			columns: [
 				{
 					field: "ck",
-					checkbox: true
+					checkbox: true,
+					width: 30,
+					widthUnit: "px"
 				},
 				{
 					field: "name",
@@ -255,22 +240,31 @@
 				{
 					field: "desc",
 					title: " ",
+					width: 30,
+					widthUnit: "%",
 					formatter: function(value, row) {
 						if (row.type == "tp-proj") {
 							return `<button type="button" class="btn btn-info" onclick="onAddSuitModalOpen(event, ${row.id})">Add suit</button>`
 						} else if (row.type == "tp-suit") {
 							return `<button type="button" class="btn btn-info" onclick="onAddCaseModalOpen(event, ${row.id})">Add case</button>`
 						} else if (row.type == "tp-case") {
-							return `<input class="form-control"  type="text" value="${row.assignee || ''}" onchange="onAssigneeChange(event, '${row.uniqueId}')"></input>`
+							return !row.assigneeName
+							 	? `<select class="assignee-selector form-select form-select-md" data-uniqueid="${row.uniqueId}"></select>`
+							 	: `<select class="assignee-selector form-select form-select-md" data-uniqueid="${row.uniqueId}">
+							 		<option value="${row.assignee}" selected="selected">${row.assigneeName}</option>
+							 	</select>`
+
 						}
 					}
 				},
 				{
-					field: "action",
+					field: "desc",
 					title: " ",
+					width: 30,
+					widthUnit: "%",
 					formatter: function(value, row) {
 						if (row.type == "tp-case") {
-							return `<select class="form-select form-select-md" name="tc_status" id="Status" onchange="onTCStatusChange(event, '${row.uniqueId}')">
+							return `<select class="status-selector form-select form-select-md" data-uniqueid="${row.uniqueId}">
 								<option ${'IN PROGRESS' == row.tc_status ? "selected" : ""}>IN PROGRESS</option>
 								<option ${'SUCCEED' == row.tc_status ? "selected" : ""}>SUCCEED</option>
 								<option ${'FAILED' == row.tc_status ? "selected" : ""}>FAILED</option>
@@ -297,6 +291,19 @@
 		});
 	});
 
+	$(function() {
+		var selects = $('.assignee-selector');
+		for (var i = 0; i < selects.length; i++) {
+			var select = selects[i];
+			$(select).select2({
+				placeholder: 'Select assignee',
+				ajax: {
+					url: "{% url 'get_list_of_users' %}",
+					dataType: 'json',
+				}
+			});
+		}
+	});
 </script>
 	<div class="form-wrapper">
 		{% if user.is_authenticated %}

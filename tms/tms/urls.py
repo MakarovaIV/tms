@@ -51,4 +51,5 @@ urlpatterns = [
     path('plan/getprojects/', views.get_projects_to_add, name='getprojects'),
     path('plan/getsuits/', views.get_suits_to_add, name='getsuits'),
     path('plan/getcases/', views.get_cases_to_add, name='getcases'),
+    path('plan/getusers/', views.get_list_of_users, name='get_list_of_users'),
 ]
