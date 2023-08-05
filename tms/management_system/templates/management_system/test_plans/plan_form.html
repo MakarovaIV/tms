@@ -8,7 +8,8 @@
 </style>
 <link href="https://cdn.jsdelivr.net/npm/jquery-treegrid@0.3.0/css/jquery.treegrid.css" rel="stylesheet">
 <link rel="stylesheet" href="https://unpkg.com/bootstrap-table@1.22.1/dist/bootstrap-table.min.css">
-<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"><link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet">
 <script src="https://code.jquery.com/jquery-3.7.0.min.js" integrity="sha256-2Pmvv0kuTBOenSvLm6bvfBSSHrUJ+3A7x6P5Ebd07/g=" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/jquery-treegrid@0.3.0/js/jquery.treegrid.min.js"></script>
 <script src="https://unpkg.com/bootstrap-table@1.22.1/dist/bootstrap-table.min.js"></script>
@@ -114,6 +115,7 @@
 				startIndex++;
 			}
 		});
+		initSelects();
 		bootstrap.Modal.getInstance('#addCaseModal').hide()
 	}
 
@@ -211,6 +213,7 @@
 				values: selectedNodes.map(n => n.uniqueId)
 			});
 		}
+		initSelects();
 	};
 
 	$(function() {
@@ -253,7 +256,6 @@
 							 	: `<select class="assignee-selector form-select form-select-md" data-uniqueid="${row.uniqueId}">
 							 		<option value="${row.assignee}" selected="selected">${row.assigneeName}</option>
 							 	</select>`
-
 						}
 					}
 				},
@@ -291,19 +293,51 @@
 		});
 	});
 
-	$(function() {
-		var selects = $('.assignee-selector');
-		for (var i = 0; i < selects.length; i++) {
-			var select = selects[i];
-			$(select).select2({
-				placeholder: 'Select assignee',
-				ajax: {
-					url: "{% url 'get_list_of_users' %}",
-					dataType: 'json',
-				}
-			});
+	var selectChangeHandler = function(e) {
+		var tree = $('#tree');
+		var select = e.target;
+		var index = select.parentNode.parentNode.dataset.index;
+		var uniqueId = select.dataset.uniqueid;
+		var treeData = tree.bootstrapTable('getData');
+		var currentRow = treeData.find(item => item.uniqueId == uniqueId);
+		if (select.classList.contains("assignee-selector")) {
+			currentRow.assignee = select.value;
+			currentRow.assigneeName = select.selectedOptions[0]?.text;
+		} else if (select.classList.contains("status-selector")) {
+			currentRow.tc_status = select.value;
 		}
-	});
+		tree.bootstrapTable('updateRow', {
+			index,
+			row: currentRow
+	  	})
+	  	initSelects();
+	};
+
+	var initSelect = function(select) {
+		$(select).select2({
+			placeholder: 'Select assignee',
+			ajax: {
+				url: "{% url 'get_list_of_users' %}",
+				dataType: 'json',
+			}
+		});
+		$(select).on("change.select2", selectChangeHandler);
+	};
+
+	var initSelects = function() {
+		$(function() {
+			var assigneeSelectors = $('.assignee-selector');
+			for (var i = 0; i < assigneeSelectors.length; i++) {
+				initSelect(assigneeSelectors[i]);
+			}
+			var statusSelectors = $('.status-selector');
+			for (var i = 0; i < statusSelectors.length; i++) {
+				statusSelectors[i].addEventListener("change", selectChangeHandler);
+			}
+		});
+	};
+
+	initSelects();
 </script>
 	<div class="form-wrapper">
 		{% if user.is_authenticated %}

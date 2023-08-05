@@ -18,6 +18,13 @@ class PlanView(ListView):
     def get_queryset(self):
         return TP.objects.all().order_by('id')
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        if context['object_list']:
+            for obj in context['object_list']:
+                obj.creation_date = str(obj.creation_date.date())
+        return context
+
 
 class PlanCreateView(CreateView):
     model = TP
