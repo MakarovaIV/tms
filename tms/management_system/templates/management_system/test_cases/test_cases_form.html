@@ -28,6 +28,13 @@
 </style>
 <script>
 	var submitHandler = function() {
+		var form = document.querySelector("form");
+		var formValid = !!form.status.value && !!form.desc.value && !!form.name.value;
+			if (!formValid) {
+				alert("Fill all fields!");
+				bootstrap.Modal.getInstance('#saveModal').hide()
+				return;
+			}
 		var textareas = [...document.querySelectorAll("textarea")]
 		.filter(item => item.dataset.hasOwnProperty("index"))
 		.sort((a, b) => a.dataset.index - b.dataset.index)
@@ -41,7 +48,6 @@
 			var currentItem = steps[item.index];
 			currentItem[item.name] = item.value;
 		})
-		var form = document.querySelector("form");
 		form.steps.value = JSON.stringify(steps);
 		form.submit();
 	};

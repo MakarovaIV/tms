@@ -45,6 +45,12 @@ class TestCaseCreateView(CreateView):
         context["proj_id"] = get_object_or_404(Project, id=self.kwargs['proj_id']).id
         context["suit_id"] = get_object_or_404(Suit, id=self.kwargs['suit_id']).id
         context["steps"] = [{"index": 0, "step_name": "Step name", "step_value": "Expected result"}]
+        cleaned_data = kwargs["form"].cleaned_data if "form" in kwargs else None
+        if cleaned_data:
+            context["name"] = cleaned_data['name'] if "name" in cleaned_data else ""
+            context["desc"] = cleaned_data['desc'] if "desc" in cleaned_data else ""
+            context["steps"] = cleaned_data['steps'] if "steps" in cleaned_data else ""
+            context["status"] = cleaned_data['status'] if "status" in cleaned_data else "DRAFT"
         return context
 
     def form_valid(self, form):

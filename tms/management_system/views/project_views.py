@@ -29,6 +29,10 @@ class ProjectCreateView(CreateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["user_id"] = self.request.user.id
+        cleaned_data = kwargs["form"].cleaned_data if "form" in kwargs else None
+        if cleaned_data:
+            context["name"] = cleaned_data['name'] if "name" in cleaned_data else ""
+            context["desc"] = cleaned_data['desc'] if "desc" in cleaned_data else ""
         return context
 
     def form_valid(self, form):

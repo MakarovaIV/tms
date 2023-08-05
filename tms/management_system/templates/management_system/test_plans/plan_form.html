@@ -17,6 +17,12 @@
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script>
 	var submitHandler = function() {
+		var formValid = !!myform.status.value && !!myform.desc.value && !!myform.name.value;
+		if (!formValid) {
+			alert("Fill all fields!");
+			bootstrap.Modal.getInstance('#saveModal').hide()
+			return;
+		}
 		var tree = $('#tree');
 		var data = tree.bootstrapTable('getData');
 
