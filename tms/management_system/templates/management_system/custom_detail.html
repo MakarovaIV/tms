@@ -1,0 +1,29 @@
+{% extends 'root.html' %}
+
+{% block content %}
+	<style>
+		.profile-wrapper {
+			display: flex;
+			flex-direction: column;
+			align-items: start;
+			flex-grow: 1;
+		}
+	</style>
+	<div class="form-wrapper">
+		<h3>Profile</h3>
+
+		<p class="field-wrapper">
+			<label for="Name">Login: </label>
+			<label class="form-control" name="username" id="Name">{ customuser.username }}</label>
+		</p>
+		<p class="field-wrapper">
+			<label for="Email">E-mail: </label>
+			<label class="form-control" name="username" id="Email">{ customuser.email }}</label>
+		</p>
+		<p>
+			<span>Avatar</span>
+			<img class="user_avatar" style="background-image: url('{%url 'get_user_image' pk=customuser.id %}');"/>
+		</p>
+
+	</div>
+{% endblock %}

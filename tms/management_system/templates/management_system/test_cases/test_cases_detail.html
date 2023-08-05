@@ -136,105 +136,69 @@
 </script>
 	<div class="form-wrapper">
 		{% if user.is_authenticated %}
-		<div class="btn-toolbar" role="toolbar">
-			<a href="{% url 'test_cases' proj_id=proj_id suit_id=suit_id %}" class="btn btn-secondary">
-				Back in test-cases
-			</a>
-		</div>
-		{% if request.user.type == 'Tester' or request.user.type == 'Admin' or request.user.type == 'Owner' %}
+			<div class="btn-toolbar" role="toolbar">
+				<a href="{% url 'test_cases' proj_id=proj_id suit_id=suit_id %}" class="btn btn-secondary">
+					Back in test-cases
+				</a>
+			</div>
 			<div class="case-wrapper">
 				<div class="row">
-					{% if tc and tc.pk %}
 					<h3 class="col-sm-6">Edit test-case</h3>
 					<a class="btn btn-success col-sm-2" href="{% url 'tc_history' proj_id=proj_id suit_id=suit_id pk=tc.pk %}">Show history</a>
-					{% else %}
-					<h3 class="col-sm-6">Create new test-case</h3>
-					{% endif %}
 				</div>
-				{% if tc and tc.pk %}
 				<form action="{% url 'tc_update' proj_id=proj_id suit_id=suit_id pk=tc.pk %}" method="post">
-				{% else %}
-				<form  action="{% url 'tc_create' proj_id=proj_id suit_id=suit_id %}" method="post">
-				{% endif %}
 
-				{% csrf_token %}
-					<div class="form-with-fields">
-						<input name="user_id" value="{{ user_id }}" class="invisible"/>
-						<input name="proj_id" value="{{ proj_id }}" class="invisible"/>
-						<input name="suit_id" value="{{ suit_id }}" class="invisible"/>
-						<input name="steps" class="invisible"/>
-						<p class="field-wrapper">
-							<label for="TCName">Test-case name</label>
-							<input class="form-control" name="name" id="TCName" value="{{ name }}"/>
-						</p>
-						{% if tc and tc.pk %}
-							<p class="field-wrapper">
-								<label>Created by: </label>
-								<label>{{ tc.user.username }}</label>
-							</p>
-							<p class="field-wrapper">
-								<label>Modified by: </label>
-								<label>{{ modified_by.username }}</label>
-							</p>
-							<p class="field-wrapper">
-								<label>Creation date: </label>
-								<label>{{ tc.creation_date }}</label>
-							</p>
-							<p class="field-wrapper">
-								<label>Modification date: </label>
-								<label>{{ tc.modification_date }}</label>
-							</p>
-						{% endif %}
+			{% csrf_token %}
+				<div class="form-with-fields">
+					<input name="user_id" value="{{ user_id }}" class="invisible"/>
+					<input name="proj_id" value="{{ proj_id }}" class="invisible"/>
+					<input name="suit_id" value="{{ suit_id }}" class="invisible"/>
+					<input name="steps" class="invisible"/>
+					<p class="field-wrapper">
+						<label>Test-case name: </label>
+						<label>{{ name}}</label>
 
+					</p>
+					{% if tc and tc.pk %}
 						<p class="field-wrapper">
-							<label for="Desc">Description</label>
-							<textarea class="form-control" name="desc" id="Desc">{{ desc }}</textarea>
+							<label>Created by: </label>
+							<label>{{ tc.user.username }}</label>
 						</p>
 						<p class="field-wrapper">
-							<label for="Status">Status</label>
-							<select class="form-select form-select-md mb-3" name="status" id="Status">
-								<option {% if 'DRAFT' == status %} selected {% endif %}>DRAFT</option>
-								<option {% if 'ACTIVE' == status %} selected {% endif %}>ACTIVE</option>
-								<option {% if 'OUTDATED' == status %} selected {% endif %}>OUTDATED</option>
-							</select>
+							<label>Modified by: </label>
+							<label>{{ modified_by.username }}</label>
 						</p>
+						<p class="field-wrapper">
+							<label>Creation date: </label>
+							<label>{{ tc.creation_date }}</label>
+						</p>
+						<p class="field-wrapper">
+							<label>Modification date: </label>
+							<label>{{ tc.modification_date }}</label>
+						</p>
+					{% endif %}
 
-					</div>
-					<button class="btn btn-success" onclick="addStep()" type="button">Add step</button>
-					<div class="steps-wrapper" id="stepsWrapper">
-						{% for step in steps %}
-							<div class="step" data-index="{{ step.index }}">
-								<p class="step_number">{{ step.index }}</p>
-								<textarea class="form-control" name="step_name" data-index="{{ step.index }}">{{ step.step_name }}</textarea>
-								<textarea class="form-control" name="step_value" data-index="{{ step.index }}">{{ step.step_value }}</textarea>
-								<button class="btn btn-danger" onclick="delStep(event)" type="button" data-index="{{ step.index }}">Delete</button>
-								<button class="btn btn-secondary" onclick="copyStep(event)" type="button" data-index="{{ step.index }}">Copy</button>
-							</div>
-						{% endfor %}
-					</div>
-				</form>
-				</form>
-				<button class="btn btn-success" type="button" data-bs-toggle="modal" data-bs-target="#saveModal">Save</button>
-				<div class="modal fade" id="saveModal" tabindex="-1" aria-labelledby="saveModalLabel" aria-hidden="true">
-				  <div class="modal-dialog">
-					<div class="modal-content">
-					  <div class="modal-header">
-						<h5 class="modal-title" id="saveModalLabel">Are you sure to save changes?</h5>
-						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-					  </div>
-					  <div class="modal-footer">
-						<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-						<button type="button" class="btn btn-primary" onclick="submitHandler()">Save changes</button>
-					  </div>
-					</div>
-				  </div>
+					<p class="field-wrapper">
+						<label>Description:</label>
+						<label>{{ desc }}</label>
+					</p>
+					<p class="field-wrapper">
+						<label>Status:</label>
+						<label>{{ status }}</label>
+					</p>
+
 				</div>
+				<div class="steps-wrapper" id="stepsWrapper">
+					{% for step in steps %}
+						<div class="step" data-index="{{ step.index }}">
+							<label class="step_number">{{ step.index }}</label>
+							<label class="form-control" name="step_name" data-index="{{ step.index }}">{{ step.step_name }}</label>
+							<label class="form-control" name="step_value" data-index="{{ step.index }}">{{ step.step_value }}</label>
+						</div>
+					{% endfor %}
+				</div>
+			</form>
 			</div>
-			{% else %}
-				<div class="alert alert-warning" role="alert" style="width: 100%">
-					You do not have permissions
-				</div>
-			{% endif %}
 		{% else %}
 			<div class="alert alert-warning" role="alert" style="width: 100%">
 				You are not authorized

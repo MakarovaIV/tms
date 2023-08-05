@@ -4,6 +4,13 @@ from django.forms import PasswordInput, EmailInput
 
 from .models import CustomUser, Project, TC, Suit, TP, Report
 
+ROLES = [
+    ("Admin", "Admin"),
+    ("Owner", "Owner"),
+    ("Developer", "Developer"),
+    ("Tester", "Tester")
+]
+
 TC_STATUS = [
     ("ACTIVE", "ACTIVE"),
     ("DRAFT", "DRAFT"),
@@ -28,14 +35,14 @@ class CustomUserCreationForm(UserCreationForm):
 
     class Meta:
         model = CustomUser
-        fields = ["username", "email", "picture"]
+        fields = ["username", "email", "picture", "type"]
 
 
 class CustomUserChangeForm(UserChangeForm):
 
     class Meta:
         model = CustomUser
-        fields = ["username", "email", "picture"]
+        fields = ["username", "email", "picture", "type"]
 
 
 class SignUpForm(UserCreationForm):
@@ -44,10 +51,11 @@ class SignUpForm(UserCreationForm):
     password1 = forms.CharField(label='Password', widget=PasswordInput)
     password2 = forms.CharField(label='Repeat Password', widget=PasswordInput)
     picture = forms.FileField(label='Avatar', required=False)
+    type = forms.ChoiceField(label='Role', choices=ROLES)
 
     class Meta:
         model = CustomUser
-        fields = ["username", "email", "picture"]
+        fields = ["username", "email", "picture", "type"]
 
     def clean_email(self):
         '''

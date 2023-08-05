@@ -5,12 +5,15 @@
 {% endblock %}
 
 {% block content %}
-	<div class="btn-toolbar" role="toolbar">
-		<a href="{% url 'project_create' %}" class="btn btn-secondary">
-			New project
-		</a>
-	</div>
-    <div class="row cards-wrapper">
+	{% if user.is_authenticated %}
+		{% if request.user.type == 'Tester' or request.user.type == 'Admin' or request.user.type == 'Owner' %}
+			<div class="btn-toolbar" role="toolbar">
+				<a href="{% url 'project_create' %}" class="btn btn-secondary">
+					New project
+				</a>
+			</div>
+		{% endif %}
+    	<div class="row cards-wrapper">
 		{% for project in projects %}
 		<div class="col-sm-6 col-md-4 col-lg-3 object-card">
 			<div class="card">
@@ -23,12 +26,12 @@
 					<p>Creation date: {{project.creation_date}}</p>
 
 
-					<a href="{% url 'project_update' pk=project.pk %}" class="btn btn-secondary">
-						Edit
-					</a>
-
-					<button class="btn btn-danger" type="button" data-bs-toggle="modal" data-bs-target="#deleteModel_{{ project.pk }}">Delete</button>
-
+					{% if request.user.type == 'Tester' or request.user.type == 'Admin' or request.user.type == 'Owner' %}
+						<a href="{% url 'project_update' pk=project.pk %}" class="btn btn-secondary">
+							Edit
+						</a>
+						<button class="btn btn-danger" type="button" data-bs-toggle="modal" data-bs-target="#deleteModel_{{ project.pk }}">Delete</button>
+					{% endif %}
 				</div>
 			</div>
 			<form action="{% url 'project_del' pk=project.pk %}" method="post">
@@ -93,4 +96,9 @@
         </ul>
     </nav>
     </div>
+		{% else %}
+			<div class="alert alert-warning" role="alert" style="width: 100%">
+				You are not authorized
+			</div>
+		{% endif %}
 {% endblock %}

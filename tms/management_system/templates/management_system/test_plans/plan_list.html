@@ -5,11 +5,14 @@
 {% endblock %}
 
 {% block content %}
-	<div class="btn-toolbar" role="toolbar">
-		<a href="{% url 'plan_create' %}" class="btn btn-secondary">
-			New test plan
-		</a>
-	</div>
+{% if user.is_authenticated %}
+	{% if request.user.type == 'Tester' or request.user.type == 'Admin' or request.user.type == 'Owner' %}
+		<div class="btn-toolbar" role="toolbar">
+			<a href="{% url 'plan_create' %}" class="btn btn-secondary">
+				New test plan
+			</a>
+		</div>
+	{% endif %}
     <div class="row cards-wrapper">
 		{% for plan in plans %}
 		<div class="col-sm-6 col-md-4 col-lg-3 object-card">
@@ -23,30 +26,32 @@
 					<p>Creation date: {{plan.creation_date}}</p>
 
 
-					<a href="{% url 'plan_update' pk=plan.pk %}" class="btn btn-secondary">
-						Edit
-					</a>
-					<button class="btn btn-danger" type="button" data-bs-toggle="modal" data-bs-target="#deleteModel_{{ plan.pk }}">Delete</button>
+					{% if request.user.type == 'Tester' or request.user.type == 'Admin' or request.user.type == 'Owner' %}
+						<a href="{% url 'plan_update' pk=plan.pk %}" class="btn btn-secondary">
+							Edit
+						</a>
+						<button class="btn btn-danger" type="button" data-bs-toggle="modal" data-bs-target="#deleteModel_{{ plan.pk }}">Delete</button>
+					{% endif %}
 				</div>
 			</div>
 			<form action="{% url 'plan_del' pk=plan.pk %}" method="post">
 
-		{% csrf_token %}
-			<div class="modal fade" id="deleteModel_{{ plan.pk }}" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
-			  <div class="modal-dialog">
-				<div class="modal-content">
-				  <div class="modal-header">
-					<h5 class="modal-title" id="deleteModalLabel">Are you sure to delete test-case?</h5>
-					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-				  </div>
-				  <div class="modal-footer">
-					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-					<button class="btn btn-danger" type="submit">Delete</button>
+			{% csrf_token %}
+				<div class="modal fade" id="deleteModel_{{ plan.pk }}" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+				  <div class="modal-dialog">
+					<div class="modal-content">
+					  <div class="modal-header">
+						<h5 class="modal-title" id="deleteModalLabel">Are you sure to delete test-case?</h5>
+						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+					  </div>
+					  <div class="modal-footer">
+						<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+						<button class="btn btn-danger" type="submit">Delete</button>
+					  </div>
+					</div>
 				  </div>
 				</div>
-			  </div>
-			</div>
-		</form>
+			</form>
 		</div>
 		{% endfor %}
         <nav aria-label="Page navigation example" class="page">
@@ -91,4 +96,9 @@
         </ul>
     </nav>
     </div>
+{% else %}
+	<div class="alert alert-warning" role="alert" style="width: 100%">
+		You are not authorized
+	</div>
+{% endif %}
 {% endblock %}

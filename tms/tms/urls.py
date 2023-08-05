@@ -20,7 +20,6 @@ from management_system import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', views.ProjectView.as_view(), name="index"),
     path('signup/', views.register, name="signup"),
     path('login/', views.login_handler, name="login"),
     path('logout/', views.logout_handler, name="logout"),
@@ -37,6 +36,7 @@ urlpatterns = [
     path('projects/<int:proj_id>/suit/<int:suit_id>/', views.TestCaseView.as_view(), name="test_cases"),
     path('projects/<int:proj_id>/suit/<int:suit_id>/tc/', views.TestCaseCreateView.as_view(), name="tc_create"),
     path('projects/<int:proj_id>/suit/<int:suit_id>/tc/<int:pk>/', views.TestCaseUpdate.as_view(), name="tc_update"),
+    path('projects/<int:proj_id>/suit/<int:suit_id>/tc/<int:pk>/detail', views.TestCaseDetail.as_view(), name="tc_detail"),
     path('projects/<int:proj_id>/suit/<int:suit_id>/tc/delete/<int:pk>', views.delete_test_case, name="tc_delete"),
     path('projects/<int:proj_id>/suit/<int:suit_id>/tc_history/<int:pk>', views.TCHistoryView.as_view(), name="tc_history"),
     path('projects/<int:proj_id>/suit/<int:suit_id>/tc_history/<int:pk>/detail/', views.TCHistoryDetailView.as_view(), name="tc_history_detail"),
@@ -58,4 +58,8 @@ urlpatterns = [
     path('report/view/<int:pk>/', views.report_detail, name='report_detail'),
     path('report/view/<int:pk>/', views.report_detail, name='report_detail'),
     path('report/getplans/', views.get_list_of_plans, name='get_list_of_plans'),
+    path('search_case/', views.search_case, name='search_case'),
+
+    path('get_user_image/<int:pk>/', views.get_user_image, name="get_user_image"),
+    path('settings/<int:pk>/', views.UserSettings.as_view(), name="settings"),
 ]

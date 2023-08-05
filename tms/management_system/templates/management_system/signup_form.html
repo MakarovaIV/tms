@@ -11,11 +11,38 @@
 			margin-right: 1rem;
 		}
 	</style>
-	<div>
+	<div class="form-wrapper">
 		<h2>Sign up</h2>
 		<form method="POST" class="form-group" enctype="multipart/form-data">
 			{% csrf_token %}
-			{{ form.as_p }}
+			<p class="field-wrapper">
+				<label for="Name">Login: </label>
+				<input class="form-control" name="username" id="Name" value="{{ username }}"/>
+			</p>
+			<p class="field-wrapper">
+				<label for="Email">E-mail: </label>
+				<input class="form-control" name="email" id="Email" value="{{ email }}"/>
+			</p>
+			<div class="mb-3">
+			  <label for="formFile" class="form-label">Choose avatar: </label>
+			  <input class="form-control" type="file" id="formFile" name="picture" value="{{ picture }}">
+			</div>
+			<p class="field-wrapper">
+				<label for="Role">Role: </label>
+				<select class="form-select form-select-md mb-3" name="type" id="Role" value="{{ type }}">
+					<option {% if 'Owner' == type %} selected {% endif %}>Owner</option>
+					<option {% if 'Developer' == type %} selected {% endif %}>Developer</option>
+					<option {% if 'Tester' == type %} selected {% endif %}>Tester</option>
+				</select>
+			</p>
+			<p class="field-wrapper">
+				<label for="Pass1">Password: </label>
+				<input class="form-control" name="password1" id="Pass1" value="{{ password1 }}" type="password" autocomplete="off"/>
+			</p>
+			<p class="field-wrapper">
+				<label for="Pass2">Repeat password: </label>
+				<input class="form-control" name="password2" id="Pass2" value="{{ password2 }}" type="password" autocomplete="off"/>
+			</p>
 			<button type="submit" class="btn btn-primary">Sign up</button>
 		</form>
 	</div>

@@ -55,12 +55,13 @@
 		}
 	</style>
 
-	<div class="btn-back">
-		<a href="{% url 'tc_update' proj_id=proj_id suit_id=suit_id pk=tc.pk %}" class="btn btn-secondary">
-			Back in {{ tc.name }}
-		</a>
-	</div>
-    <div class="main">
+	{% if user.is_authenticated %}
+		<div class="btn-back">
+			<a href="{% url 'tc_update' proj_id=proj_id suit_id=suit_id pk=tc.pk %}" class="btn btn-secondary">
+				Back in {{ tc.name }}
+			</a>
+		</div>
+		<div class="main">
 		{% for tc in tc_history %}
 			<div class="proj-div">
 				<p>Version {{ tc.id }}</p>
@@ -119,10 +120,10 @@
         </ul>
     </nav>
     </div>
-{% endblock %}
-{% block footer %}
-	<div>
 
-	</div>
-
+	{% else %}
+		<div class="alert alert-warning" role="alert" style="width: 100%">
+			You are not authorized
+		</div>
+	{% endif %}
 {% endblock %}

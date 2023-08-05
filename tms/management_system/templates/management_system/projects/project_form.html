@@ -3,32 +3,43 @@
 {% block content %}
 	<div class="form-wrapper">
 		{% if user.is_authenticated %}
-
-
+			<div class="btn-toolbar" role="toolbar">
+				<a href="{% url 'projects' %}" class="btn btn-secondary">
+					Back in projects
+				</a>
+			</div>
+			{% if request.user.type == 'Tester' or request.user.type == 'Admin' or request.user.type == 'Owner' %}
 			{% if project and project.pk %}
-			<form class="form-with-fields" action="{% url 'project_update' pk=project.pk %}" method="post">
+				<form class="form-with-fields" action="{% url 'project_update' pk=project.pk %}" method="post">
 
-				<h3>Edit project</h3>
+					<h3>Edit project</h3>
+				{% else %}
+				<form class="form-with-fields" action="{% url 'project_create' %}" method="post">
+					<h3>Create new project</h3>
+				{% endif %}
+
+				{% csrf_token %}
+					<input name="user_id" value="{{ user_id }}" class="invisible"/>
+					<p class="field-wrapper">
+						<label for="ProjName">Project name</label>
+						<input class="form-control" name="name" id="ProjName" value="{{ name }}"/>
+					</p>
+					<p class="field-wrapper">
+						<label for="Desc">Description</label>
+						<textarea class="form-control" name="desc" id="Desc">{{ desc }}</textarea>
+					</p>
+					<button class="btn btn-success" type="submit">Create</button>
+				</form>
+				</form>
 			{% else %}
-			<form class="form-with-fields" action="{% url 'project_create' %}" method="post">
-				<h3>Create new project</h3>
+				<div class="alert alert-warning" role="alert" style="width: 100%">
+					You are not authorized
+				</div>
 			{% endif %}
-
-			{% csrf_token %}
-				<input name="user_id" value="{{ user_id }}" class="invisible"/>
-				<p class="field-wrapper">
-					<label for="ProjName">Project name</label>
-					<input class="form-control" name="name" id="ProjName" value="{{ name }}"/>
-				</p>
-				<p class="field-wrapper">
-					<label for="Desc">Description</label>
-					<textarea class="form-control" name="desc" id="Desc">{{ desc }}</textarea>
-				</p>
-				<button class="btn btn-success" type="submit">Create</button>
-			</form>
-			</form>
 		{% else %}
-			<p>You are not authorized</p>
+			<div class="alert alert-warning" role="alert" style="width: 100%">
+				You are not authorized
+			</div>
 		{% endif %}
 	</div>
 {% endblock %}

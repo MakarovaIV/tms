@@ -57,7 +57,7 @@
 				url: "{% url 'get_list_of_plans' %}",
 				idField: "uniqueId",
 				columns: [{
-					checkbox: true
+					radio: true,
 				}, {
 					field: 'id',
 					title: 'ID'
@@ -100,7 +100,7 @@
 			columns: [
 				{
 					field: "ck",
-					checkbox: true,
+					radio: true,
 					width: 30,
 					widthUnit: "px"
 				},
@@ -123,10 +123,23 @@
 			}
 		});
 	});
+
+	$(function() {
+		$('form').submit(function () {
+		  alert($(this).serialize())
+		  return false
+		})
+	  })
 </script>
 	<div class="form-wrapper">
 		{% if user.is_authenticated %}
-			<form class="form-with-fields" action="{% url 'report_create' %}" method="post" id="myform">
+			<div class="btn-toolbar" role="toolbar">
+				<a href="{% url 'reports' %}" class="btn btn-secondary">
+					Back in reports
+				</a>
+			</div>
+			{% if request.user.type == 'Tester' or request.user.type == 'Admin' or request.user.type == 'Owner' %}
+				<form class="form-with-fields" action="{% url 'report_create' %}" method="post" id="myform">
 				<h3>Create new report</h3>
 
 				{% csrf_token %}
@@ -160,24 +173,31 @@
 				</div>
 			</form>
 
-			<button class="btn btn-success" type="button" data-bs-toggle="modal" data-bs-target="#saveModal">Save</button>
-			<div class="modal fade" id="saveModal" tabindex="-1" aria-labelledby="saveModalLabel" aria-hidden="true">
-				<div class="modal-dialog">
-					<div class="modal-content">
-						<div class="modal-header">
-							<h5 class="modal-title" id="saveModalLabel">Are you sure to save changes?</h5>
-							<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-						</div>
-						<div class="modal-footer">
-							<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-							<button type="button" class="btn btn-primary" onclick="submitHandler()">Save changes</button>
+					<button class="btn btn-success" type="button" data-bs-toggle="modal" data-bs-target="#saveModal">Save</button>
+					<div class="modal fade" id="saveModal" tabindex="-1" aria-labelledby="saveModalLabel" aria-hidden="true">
+						<div class="modal-dialog">
+							<div class="modal-content">
+								<div class="modal-header">
+									<h5 class="modal-title" id="saveModalLabel">Are you sure to save changes?</h5>
+									<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+								</div>
+								<div class="modal-footer">
+									<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+									<button type="button" class="btn btn-primary" onclick="submitHandler()">Save changes</button>
+								</div>
+							</div>
 						</div>
 					</div>
+				</form>
+			{% else %}
+				<div class="alert alert-warning" role="alert" style="width: 100%">
+					You do not have permissions
 				</div>
-			</div>
-			</form>
+			{% endif %}
 		{% else %}
-			<p>You are not authorized</p>
+			<div class="alert alert-warning" role="alert" style="width: 100%">
+				You are not authorized
+			</div>
 		{% endif %}
 	</div>
 {% endblock %}

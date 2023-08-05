@@ -56,10 +56,21 @@
 		assigneeResult.render();
 	}
 </script>
-	<div class="cards-wrapper">
-		<div class="chart" id="planResult"></div>
-		<div class="chart" id="assigneeResult"></div>
-	</div>
+	{% if user.is_authenticated %}
+		<div class="btn-toolbar" role="toolbar">
+			<a href="{% url 'reports' %}" class="btn btn-secondary">
+				Back in reports
+			</a>
+		</div>
+		<div class="cards-wrapper">
+			<div class="chart" id="planResult"></div>
+			<div class="chart" id="assigneeResult"></div>
+		</div>
+	{% else %}
+		<div class="alert alert-warning" role="alert" style="width: 100%">
+			You are not authorized
+		</div>
+	{% endif %}
 
 
 {% endblock %}

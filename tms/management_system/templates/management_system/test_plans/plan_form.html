@@ -133,6 +133,7 @@
 			$('#addProjectTable').bootstrapTable({
 				url: "{% url 'getprojects' %}",
 				idField: "uniqueId",
+				clickToSelect: "true",
 				columns: [{
 					checkbox: true
 				}, {
@@ -161,6 +162,7 @@
 			$('#addSuitTable').bootstrapTable({
 				url: "{% url 'getsuits' %}" + "?projectid=" + projId,
 				idField: "uniqueId",
+				clickToSelect: "true",
 				columns: [{
 					checkbox: true
 				}, {
@@ -189,6 +191,7 @@
 			$('#addCaseTable').bootstrapTable({
 				url: "{% url 'getcases' %}" + "?suitid=" + suitId,
 				idField: "uniqueId",
+				clickToSelect: "true",
 				columns: [{
 					checkbox: true
 				}, {
@@ -230,6 +233,7 @@
 			showColumns: false,
 			treeShowField: 'name',
 			parentIdField: 'parentId',
+			clickToSelect: "true",
 			rowStyle :  function(row, index) {
 				return {
 					classes: row.type
@@ -347,117 +351,128 @@
 </script>
 	<div class="form-wrapper">
 		{% if user.is_authenticated %}
-			{% if plan and plan.pk %}
-			<h3>Edit test-plan</h3>
+			<div class="btn-toolbar" role="toolbar">
+				<a href="{% url 'plans' %}" class="btn btn-secondary">
+					Back in test-plans
+				</a>
+			</div>
+			{% if request.user.type == 'Tester' or request.user.type == 'Admin' or request.user.type == 'Owner' %}
+				{% if plan and plan.pk %}
+				<h3>Edit test-plan</h3>
+				{% else %}
+				<h3>Create new test-plan</h3>
+				{% endif %}
+
+				{% if plan and plan.pk %}
+				<form class="form-with-fields" action="{% url 'plan_update' pk=plan.pk %}" method="post" id="myform">
+				{% else %}
+				<form class="form-with-fields" action="{% url 'plan_create' %}" method="post" id="myform">
+				{% endif %}
+
+					{% csrf_token %}
+					<input name="user_id" value="{{ user_id }}" class="invisible"/>
+					<input name="modified_by_id" value="{{ modified_by_id }}" class="invisible"/>
+					<input name="proj" class="invisible"/>
+					<input name="suit" class="invisible"/>
+					<input name="tc" class="invisible"/>
+					<p class="field-wrapper">
+						<label for="TPName">Test-plan name</label>
+						<input class="form-control" name="name" id="TPName" value="{{ name }}"/>
+					</p>
+					<p class="field-wrapper">
+						<label for="Desc">Description</label>
+						<textarea class="form-control" name="desc" id="Desc">{{ desc }}</textarea>
+					</p>
+					<p class="field-wrapper">
+						<label for="Status">Status</label>
+						<select class="form-select form-select-md mb-3" name="status" id="Status">
+							<option {% if 'IN PROGRESS' == status %} selected {% endif %}>IN PROGRESS</option>
+							<option {% if 'DONE' == status %} selected {% endif %}>DONE</option>
+							<option {% if 'CANCELLED' == status %} selected {% endif %}>CANCELLED</option>
+						</select>
+					</p>
+				</form>
+				</form>
+				<div class="grid-toolbar">
+					<button id="addProjectBtn" class="btn btn-success" type="button" onclick="onAddProjectModalOpen()">Add Project</button>
+					<button id="removeItemsBtn" class="btn btn-danger" type="button" onclick="removeHandler()">Remove selected</button>
+				</div>
+				<table id="tree"></table>
+				<button class="btn btn-success" type="button" data-bs-toggle="modal" data-bs-target="#saveModal">Save</button>
+				<div class="modal fade" id="addProjectModal" tabindex="-1" aria-labelledby="addProjectModalLabel" aria-hidden="true">
+					<div class="modal-dialog">
+						<div class="modal-content">
+							<div class="modal-header">
+								<h5 class="modal-title" id="addProjectModalLabel">Add project</h5>
+								<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+							</div>
+							<div class="modal-body">
+								<table id="addProjectTable"></table>
+							</div>
+							<div class="modal-footer">
+								<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+								<button type="button" class="btn btn-primary" onclick="addProjectHandler()">Add</button>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="modal fade" id="addSuitModal" tabindex="-1" aria-labelledby="addSuitModalLabel" aria-hidden="true">
+					<div class="modal-dialog">
+						<div class="modal-content">
+							<div class="modal-header">
+								<h5 class="modal-title" id="addSuitModalLabel">Add suit</h5>
+								<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+							</div>
+							<div class="modal-body">
+								<table id="addSuitTable"></table>
+							</div>
+							<div class="modal-footer">
+								<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+								<button type="button" class="btn btn-primary" onclick="addSuitHandler()">Add</button>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="modal fade" id="addCaseModal" tabindex="-1" aria-labelledby="addCaseModalLabel" aria-hidden="true">
+					<div class="modal-dialog">
+						<div class="modal-content">
+							<div class="modal-header">
+								<h5 class="modal-title" id="addCaseModalLabel">Add case</h5>
+								<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+							</div>
+							<div class="modal-body">
+								<table id="addCaseTable"></table>
+							</div>
+							<div class="modal-footer">
+								<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+								<button type="button" class="btn btn-primary" onclick="addCaseHandler()">Add</button>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="modal fade" id="saveModal" tabindex="-1" aria-labelledby="saveModalLabel" aria-hidden="true">
+					<div class="modal-dialog">
+						<div class="modal-content">
+							<div class="modal-header">
+								<h5 class="modal-title" id="saveModalLabel">Are you sure to save changes?</h5>
+								<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+							</div>
+							<div class="modal-footer">
+								<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+								<button type="button" class="btn btn-primary" onclick="submitHandler()">Save changes</button>
+							</div>
+						</div>
+					</div>
+				</div>
 			{% else %}
-			<h3>Create new test-plan</h3>
+				<div class="alert alert-warning" role="alert" style="width: 100%">
+					You do not have permissions
+				</div>
 			{% endif %}
-
-			{% if plan and plan.pk %}
-			<form class="form-with-fields" action="{% url 'plan_update' pk=plan.pk %}" method="post" id="myform">
-			{% else %}
-			<form class="form-with-fields" action="{% url 'plan_create' %}" method="post" id="myform">
-			{% endif %}
-
-
-
-			{% csrf_token %}
-				<input name="user_id" value="{{ user_id }}" class="invisible"/>
-				<input name="modified_by_id" value="{{ modified_by_id }}" class="invisible"/>
-				<input name="proj" class="invisible"/>
-				<input name="suit" class="invisible"/>
-				<input name="tc" class="invisible"/>
-				<p class="field-wrapper">
-					<label for="TPName">Test-plan name</label>
-					<input class="form-control" name="name" id="TPName" value="{{ name }}"/>
-				</p>
-				<p class="field-wrapper">
-					<label for="Desc">Description</label>
-					<textarea class="form-control" name="desc" id="Desc">{{ desc }}</textarea>
-				</p>
-				<p class="field-wrapper">
-					<label for="Status">Status</label>
-					<select class="form-select form-select-md mb-3" name="status" id="Status">
-						<option {% if 'IN PROGRESS' == status %} selected {% endif %}>IN PROGRESS</option>
-						<option {% if 'DONE' == status %} selected {% endif %}>DONE</option>
-						<option {% if 'CANCELLED' == status %} selected {% endif %}>CANCELLED</option>
-					</select>
-				</p>
-			</form>
-			</form>
-			<div class="grid-toolbar">
-				<button id="addProjectBtn" class="btn btn-success" type="button" onclick="onAddProjectModalOpen()">Add Project</button>
-				<button id="removeItemsBtn" class="btn btn-danger" type="button" onclick="removeHandler()">Remove selected</button>
-			</div>
-			<table id="tree"></table>
-			<button class="btn btn-success" type="button" data-bs-toggle="modal" data-bs-target="#saveModal">Save</button>
-			<div class="modal fade" id="addProjectModal" tabindex="-1" aria-labelledby="addProjectModalLabel" aria-hidden="true">
-				<div class="modal-dialog">
-					<div class="modal-content">
-						<div class="modal-header">
-							<h5 class="modal-title" id="addProjectModalLabel">Add project</h5>
-							<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-						</div>
-						<div class="modal-body">
-							<table id="addProjectTable"></table>
-						</div>
-						<div class="modal-footer">
-							<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-							<button type="button" class="btn btn-primary" onclick="addProjectHandler()">Add</button>
-						</div>
-					</div>
-				</div>
-			</div>
-			<div class="modal fade" id="addSuitModal" tabindex="-1" aria-labelledby="addSuitModalLabel" aria-hidden="true">
-				<div class="modal-dialog">
-					<div class="modal-content">
-						<div class="modal-header">
-							<h5 class="modal-title" id="addSuitModalLabel">Add suit</h5>
-							<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-						</div>
-						<div class="modal-body">
-							<table id="addSuitTable"></table>
-						</div>
-						<div class="modal-footer">
-							<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-							<button type="button" class="btn btn-primary" onclick="addSuitHandler()">Add</button>
-						</div>
-					</div>
-				</div>
-			</div>
-			<div class="modal fade" id="addCaseModal" tabindex="-1" aria-labelledby="addCaseModalLabel" aria-hidden="true">
-				<div class="modal-dialog">
-					<div class="modal-content">
-						<div class="modal-header">
-							<h5 class="modal-title" id="addCaseModalLabel">Add case</h5>
-							<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-						</div>
-						<div class="modal-body">
-							<table id="addCaseTable"></table>
-						</div>
-						<div class="modal-footer">
-							<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-							<button type="button" class="btn btn-primary" onclick="addCaseHandler()">Add</button>
-						</div>
-					</div>
-				</div>
-			</div>
-			<div class="modal fade" id="saveModal" tabindex="-1" aria-labelledby="saveModalLabel" aria-hidden="true">
-				<div class="modal-dialog">
-					<div class="modal-content">
-						<div class="modal-header">
-							<h5 class="modal-title" id="saveModalLabel">Are you sure to save changes?</h5>
-							<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-						</div>
-						<div class="modal-footer">
-							<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-							<button type="button" class="btn btn-primary" onclick="submitHandler()">Save changes</button>
-						</div>
-					</div>
-				</div>
-			</div>
 		{% else %}
-			<p>You are not authorized</p>
+			<div class="alert alert-warning" role="alert" style="width: 100%">
+				You are not authorized
+			</div>
 		{% endif %}
 	</div>
 

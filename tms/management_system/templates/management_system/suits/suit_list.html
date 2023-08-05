@@ -5,12 +5,19 @@
 {% endblock %}
 
 {% block content %}
-	<div class="btn-toolbar" role="toolbar">
-		<a href="{% url 'suit_create' proj_id=proj_id %}" class="btn btn-secondary">
-			New suit
-		</a>
-	</div>
-    <div class="row cards-wrapper">
+	{% if user.is_authenticated %}
+		<div class="btn-toolbar" role="toolbar">
+			<a href="{% url 'projects'%}" class="btn btn-secondary">
+				Back in projects
+			</a>
+			{% if request.user.type == 'Tester' or request.user.type == 'Admin' or request.user.type == 'Owner' %}
+				<a href="{% url 'suit_create' proj_id=proj_id %}" class="btn btn-secondary" >
+					New suit
+				</a>
+			{% endif %}
+		</div>
+
+    	<div class="row cards-wrapper">
 		{% for suit in suits %}
 		<div class="col-sm-6 col-md-4 col-lg-3 object-card">
 			<div class="card">
@@ -23,11 +30,13 @@
 					<p>Creation date: {{ suit.creation_date }}</p>
 					<p>Modified by: {{ suit.modified_by }}</p>
 					<p>Modification date: {{ suit.modification_date }}</p>
-					<a href="{% url 'suit_update' proj_id=suit.proj_id pk=suit.pk %}" class="btn btn-secondary">
-						Edit
-					</a>
-					<button class="btn btn-danger" type="button" data-bs-toggle="modal" data-bs-target="#deleteModel_{{ suit.pk }}">Delete</button>
 
+					{% if request.user.type == 'Tester' or request.user.type == 'Admin' or request.user.type == 'Owner' %}
+						<a href="{% url 'suit_update' proj_id=suit.proj_id pk=suit.pk %}" class="btn btn-secondary">
+							Edit
+						</a>
+						<button class="btn btn-danger" type="button" data-bs-toggle="modal" data-bs-target="#deleteModel_{{ suit.pk }}">Delete</button>
+					{% endif %}
 				</div>
 			</div>
 			<form action="{% url 'suit_del' proj_id=suit.proj_id pk=suit.pk %}" method="post">
@@ -92,4 +101,9 @@
         </ul>
     </nav>
     </div>
+	{% else %}
+		<div class="alert alert-warning" role="alert" style="width: 100%">
+			You are not authorized
+		</div>
+	{% endif %}
 {% endblock %}

@@ -1,7 +1,10 @@
+import json
+
 from django.contrib import messages
+from django.http import HttpResponse
 from django.shortcuts import redirect, get_object_or_404
 from django.urls import reverse_lazy
-from django.views.generic import ListView, CreateView, UpdateView
+from django.views.generic import ListView, CreateView, UpdateView, DetailView
 
 from ..forms import TestCaseCreateForm
 from ..models import CustomUser, Project, TC, TCHistory, Suit
@@ -149,7 +152,37 @@ class TestCaseUpdate(UpdateView):
         return self.render_to_response(self.get_context_data(form=form))
 
 
+class TestCaseDetail(DetailView):
+    model = TC
+    template_name = 'management_system/test_cases/test_cases_detail.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["user_id"] = self.request.user.id
+        context["proj_id"] = get_object_or_404(Project, id=self.kwargs['proj_id']).id
+        context["suit_id"] = get_object_or_404(Suit, id=self.kwargs['suit_id']).id
+        tc = get_object_or_404(TC, id=self.kwargs['pk'])
+        modified_by_id = get_object_or_404(CustomUser, id=tc.modified_by)
+        context["name"] = tc.name
+        context["desc"] = tc.desc
+        context["steps"] = tc.steps
+        context["status"] = tc.status
+        context["modified_by"] = modified_by_id
+        return context
+
+
 def delete_test_case(request, proj_id, suit_id, pk):
     if request.method == "POST":
         TC.objects.filter(id=pk).delete()
         return redirect('test_cases', proj_id=proj_id, suit_id=suit_id)
+
+
+def search_case(request):
+    inputs = request.GET.get('term', ' ')
+    results = []
+    case = TC.objects.filter(name__contains=inputs) | TC.objects.filter(desc__contains=inputs)
+    for c in case:
+        results.append(c.name)
+    data = json.dumps(results)
+    mimetype = "application/json"
+    return HttpResponse(data, mimetype)

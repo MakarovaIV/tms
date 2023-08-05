@@ -32,13 +32,16 @@
 		}
 	</style>
 
+{% if user.is_authenticated %}
 	<div class="btn-toolbar" role="toolbar">
 		<a href="{% url 'suits' pk=proj_id %}" class="btn btn-secondary">
-			Back in {{ suit_name }}
+			Back in suits
 		</a>
-		<a href="{% url 'tc_create' proj_id=proj_id suit_id=suit_id %}" class="btn btn-secondary" >
-			New test-case
-		</a>
+		{% if request.user.type == 'Tester' or request.user.type == 'Admin' or request.user.type == 'Owner' %}
+			<a href="{% url 'tc_create' proj_id=proj_id suit_id=suit_id %}" class="btn btn-secondary" >
+				New test-case
+			</a>
+		{% endif %}
 	</div>
     <table class="table">
 		<thead>
@@ -52,19 +55,31 @@
 				<th scope="col">Modified by</th>
 				<th scope="col">Modification Date</th>
 				<th scope="col"> </th>
+				<th scope="col"> </th>
 			</tr>
 		</thead>
 		<tbody>
 			{% for tc in test_cases %}
 				<tr>
 					<td scope="row">{{ tc.id }}</td>
-					<td><a href="{% url 'tc_update' proj_id=proj_id suit_id=suit_id pk=tc.pk %}" class="card-title">{{ tc.name }}</a></td>
+					<td>
+						{% if request.user.type == 'Tester' or request.user.type == 'Admin' or request.user.type == 'Owner' %}
+							<a href="{% url 'tc_update' proj_id=proj_id suit_id=suit_id pk=tc.pk %}" class="card-title">{{ tc.name }}</a>
+						{% else %}
+							<a href="{% url 'tc_detail' proj_id=proj_id suit_id=suit_id pk=tc.pk %}" class="card-title">{{ tc.name }}</a>
+						{% endif %}
+					</td>
 					<td>{{ tc.desc }}</td>
 					<td>{{ tc.status }}</td>
 					<td>{{ tc.user.username }}</td>
 					<td>{{ tc.creation_date }}</td>
 					<td>{{ tc.modified_by }}</td>
 					<td>{{ tc.modification_date }}</td>
+					<td>
+						<a href="{% url 'tc_detail' proj_id=proj_id suit_id=suit_id pk=tc.pk %}" class="btn btn-info">View</a>
+					</td>
+
+					{% if request.user.type == 'Tester' or request.user.type == 'Admin' or request.user.type == 'Owner' %}
 					<td>
 						<button class="btn btn-danger" type="button" data-bs-toggle="modal" data-bs-target="#deleteModel_{{ tc.pk }}">Delete</button>
 						<form action="{% url 'tc_delete' proj_id=proj_id suit_id=suit_id pk=tc.pk %}" method="post">
@@ -85,6 +100,7 @@
 							</div>
 						</form>
 					</td>
+					{% endif %}
 				</tr>
 			{% endfor %}
 		</tbody>
@@ -131,4 +147,9 @@
             {% endif %}
         </ul>
     </nav>
+{% else %}
+	<div class="alert alert-warning" role="alert" style="width: 100%">
+		You are not authorized
+	</div>
+{% endif %}
 {% endblock %}

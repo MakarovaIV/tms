@@ -5,6 +5,12 @@ from ..managers import CustomUserManager
 
 
 class CustomUser(AbstractUser):
+    class Types(models.TextChoices):
+        OWNER = "Owner", "Owner"
+        EMPLOYEE = "Developer", "Developer"
+        TESTER = "Tester", "Tester"
+
+    type = models.CharField(choices=Types.choices, default=Types.TESTER)
     username = models.CharField(max_length=100, unique=True)
     email = models.EmailField(max_length=100, unique=True)
     picture = models.FileField(upload_to="tmp_upload")

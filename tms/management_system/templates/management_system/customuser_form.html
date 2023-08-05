@@ -1,0 +1,58 @@
+{% extends 'root.html' %}
+
+{% block content %}
+	<style>
+		span {
+			margin-right: 1rem;
+		}
+
+		.profile-wrapper {
+			display: flex;
+			flex-direction: column;
+			align-items: start;
+			flex-grow: 1;
+		}
+	</style>
+	<div class="form-wrapper">
+		<h3>Profile</h3>
+		<form action="{% url 'settings' pk=user.id %}" method="post" enctype="multipart/form-data">
+		{% csrf_token %}
+			<input name="user_id" value="{{user_id}}" class="invisible"/>
+			<p class="field-wrapper">
+				<label for="Name">Login: </label>
+				<input class="form-control" name="username" id="Name" value="{{ user.username }}"/>
+			</p>
+
+			<p class="field-wrapper">
+				<label for="Email">E-mail: </label>
+				<input class="form-control" name="email" id="Email" value="{{ user.email }}"/>
+			</p>
+			<p class="field-wrapper">
+				<label for="Role">Status</label>
+				<select class="form-select form-select-md mb-3" name="type" id="Role" value="{{ user.type }}">
+					<option {% if 'Owner' == user.type %} selected {% endif %}>Owner</option>
+					<option {% if 'Developer' == user.type %} selected {% endif %}>Developer</option>
+					<option {% if 'Tester' == user.type %} selected {% endif %}>Tester</option>
+				</select>
+			</p>
+			<div class="mb-3">
+				<label for="formFile" class="form-label">Choose avatar</label>
+				<img id="avatar_preview" class="user_avatar" style="background-image: url('{%url 'get_user_image' pk=user.id %}');"/>
+				<input class="form-control m-3" type="file" id="formFile" name="picture">
+				<script>
+					const img_input = document.querySelector("#img_input");
+					if (img_input) {
+						img_input.onchange = evt => {
+							const [file] = img_input.files
+							if (file) {
+								 document.querySelector("#avatar_preview").src = URL.createObjectURL(file)
+							}
+						}
+					}
+				</script>
+			</div>
+
+			<button class="btn btn-success" type="submit">Save</button>
+		</form>
+	</div>
+{% endblock %}

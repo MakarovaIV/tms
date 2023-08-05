@@ -17,6 +17,7 @@ def register(request):
         form = SignUpForm(request.POST, request.FILES)
         if form.is_valid():
             user = form.save(commit=False)
+            user.type = form.cleaned_data['type']
             picture_data = form.cleaned_data['picture']
             default_pic = 'icons/user-profile-icon.png'
             if picture_data is not None:
@@ -28,6 +29,8 @@ def register(request):
             if os.path.exists('tmp_upload'):
                 shutil.rmtree('tmp_upload')
             return redirect("login")
+        else:
+            messages.error(request, form.errors)
     else:
         form = SignUpForm()
     return render(request=request,
@@ -45,11 +48,11 @@ def login_handler(request):
             if user is not None:
                 login(request, user)
                 messages.info(request, f"You are logged in as {username}.")
-                return redirect("index")
+                return redirect("projects")
             else:
                 messages.error(request, 'Login field is empty')
         else:
-            messages.error(request, 'Login or password incorrect')
+            messages.error(request, form.errors)
     form = AuthenticationForm()
     return render(request=request, template_name="management_system/login.html", context={"login_form": form})
 

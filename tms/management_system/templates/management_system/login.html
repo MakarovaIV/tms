@@ -7,17 +7,18 @@
 
 
 {% block content %}
-	<style>
-		label {
-			margin-right: 1rem;
-		}
-	</style>
-	<div>
+	<div class="form-wrapper">
 		<h2>Log-in</h2>
-
 		<form method="post" class="from-group">
 			{% csrf_token %}
-			{{ login_form.as_p }}
+			<p class="field-wrapper">
+				<label for="Name">Username: </label>
+				<input class="form-control" name="username" id="Name" value="{{ username }}"/>
+			</p>
+			<p class="field-wrapper">
+				<label for="Pass">Password: </label>
+				<input class="form-control" name="password" id="Pass" value="{{ password }}" type="password"/>
+			</p>
 			<p>Don't have an account? Create one <a href="/signup">here</a></p>
 			<button type="submit" class="btn btn-primary">Login</button>
 		</form>
