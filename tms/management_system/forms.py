@@ -2,7 +2,7 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 from django.forms import PasswordInput, EmailInput
 
-from .models import CustomUser, Project, TC, Suit, TP
+from .models import CustomUser, Project, TC, Suit, TP, Report
 
 TC_STATUS = [
     ("ACTIVE", "ACTIVE"),
@@ -130,3 +130,15 @@ class TestPlanCreateForm(forms.ModelForm):
                   'suit',
                   'tc',
                   'status']
+
+
+class ReportCreateForm(forms.ModelForm):
+    name = forms.CharField(max_length=100)
+    user_id = forms.IntegerField(required=False)
+    plan_id = forms.IntegerField(required=False)
+
+    class Meta:
+        model = Report
+        fields = ['name',
+                  'user_id',
+                  'plan_id']

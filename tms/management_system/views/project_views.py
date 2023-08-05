@@ -12,8 +12,12 @@ class ProjectView(ListView):
     template_name = 'management_system/projects/project_list.html'
     context_object_name = 'projects'
 
-    def get_queryset(self):
-        return Project.objects.all().order_by('id')
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        if context['object_list']:
+            for obj in context['object_list']:
+                obj.creation_date = str(obj.creation_date.date())
+        return context
 
 
 class ProjectCreateView(CreateView):

@@ -7,8 +7,7 @@ from django.urls import reverse_lazy
 from django.views.generic import ListView, CreateView, UpdateView
 
 from ..forms import TestPlanCreateForm
-from ..models import TP, Project, Suit, CustomUser, TC
-from ..models.test_case_in_test_plan import TCinTP
+from ..models import TP, Project, Suit, CustomUser, TC, TCinTP
 
 
 class PlanView(ListView):

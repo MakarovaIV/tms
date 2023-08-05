@@ -1,0 +1,183 @@
+{% extends 'root.html' %}
+
+{% block content %}
+<link href="https://cdn.jsdelivr.net/npm/jquery-treegrid@0.3.0/css/jquery.treegrid.css" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/bootstrap-table@1.22.1/dist/bootstrap-table.min.css">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"><link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://code.jquery.com/jquery-3.7.0.min.js" integrity="sha256-2Pmvv0kuTBOenSvLm6bvfBSSHrUJ+3A7x6P5Ebd07/g=" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/jquery-treegrid@0.3.0/js/jquery.treegrid.min.js"></script>
+<script src="https://unpkg.com/bootstrap-table@1.22.1/dist/bootstrap-table.min.js"></script>
+<script src="https://unpkg.com/bootstrap-table@1.22.1/dist/extensions/treegrid/bootstrap-table-treegrid.min.js"></script>
+<script>
+	var submitHandler = function() {
+		var tree = $('#tree');
+		var data = tree.bootstrapTable('getData');
+
+		var plan = []
+
+		data.forEach(item => {
+			if (item.type == 'tp-plan') {
+				plan.push(item.id)
+			}
+		});
+
+		myform.plan_id.value = plan[0];
+		myform.submit();
+	};
+
+	var filterExistingItems = function(type) {
+		var tree = $('#tree');
+		var rows = tree.bootstrapTable('getData');
+		rows = rows.filter(r => r.type == type);
+		var existingItems = {};
+		rows.forEach(r => existingItems[r.id] = r.id);
+		return existingItems;
+	};
+
+
+	var addPlanHandler = function() {
+		var selectedPlans = $('#addPlanTable').bootstrapTable('getSelections');
+		var existingItems = filterExistingItems('tp-plan');
+		var newNodes = selectedPlans.filter(p => !existingItems[p.id]).map(p => ({
+			"id": p.id,
+			"name": p.name,
+			"type": "tp-plan",
+			"uniqueId": "plan_" + p.id
+		}));
+		$('#tree').bootstrapTable('append', newNodes);
+		bootstrap.Modal.getInstance('#addPlanModal').hide()
+	};
+
+	var addPlanTableInitialized = false;
+	var onAddPlanModalOpen = function() {
+		var modal = new bootstrap.Modal(addPlanModal, {});
+		modal.show();
+		if (addPlanTableInitialized == false) {
+			$('#addPlanTable').bootstrapTable({
+				url: "{% url 'get_list_of_plans' %}",
+				idField: "uniqueId",
+				columns: [{
+					checkbox: true
+				}, {
+					field: 'id',
+					title: 'ID'
+				}, {
+					field: 'name',
+					title: 'Test-plan Name'
+				}]
+			})
+			addPlanTableInitialized = true;
+		} else {
+			$('#addPlanTable').bootstrapTable('refreshOptions', {
+				url: "{% url 'get_list_of_plans' %}",
+			});
+		}
+	};
+
+	var removeHandler = function() {
+		var selectedNodes = $('#tree').bootstrapTable('getSelections');
+		if (selectedNodes && selectedNodes.length > 0) {
+			$('#tree').bootstrapTable('remove', {
+				field: "uniqueId",
+				values: selectedNodes.map(n => n.uniqueId)
+			});
+		}
+	};
+
+	$(function() {
+		var tree = $('#tree')
+		tree.bootstrapTable({
+			data: {{ structure|safe }},
+			idField: "uniqueId",
+			showColumns: false,
+			treeShowField: 'name',
+			parentIdField: 'parentId',
+			rowStyle :  function(row, index) {
+				return {
+					classes: row.type
+				};
+			},
+			columns: [
+				{
+					field: "ck",
+					checkbox: true,
+					width: 30,
+					widthUnit: "px"
+				},
+				{
+					field: "name",
+					title: "Name"
+				}
+		  	],
+			onPostBody: function() {
+				var columns = tree.bootstrapTable('getOptions').columns
+
+				if (columns && columns[0][1].visible) {
+					tree.treegrid({
+						treeColumn: 1,
+						onChange: function() {
+							tree.bootstrapTable('resetView')
+						}
+					})
+				}
+			}
+		});
+	});
+</script>
+	<div class="form-wrapper">
+		{% if user.is_authenticated %}
+			<form class="form-with-fields" action="{% url 'report_create' %}" method="post" id="myform">
+				<h3>Create new report</h3>
+
+				{% csrf_token %}
+				<input name="user_id" value="{{ user_id }}" class="invisible"/>
+				<input name="plan_id" class="invisible"/>
+				<p class="field-wrapper">
+					<label for="ReportName">Report name</label>
+					<input class="form-control" name="name" id="ReportName" value="{{ name }}"/>
+				</p>
+				<div class="grid-toolbar">
+					<button id="addPlanBtn" class="btn btn-success" type="button" onclick="onAddPlanModalOpen()">Add Test-plan</button>
+					<button id="removeItemsBtn" class="btn btn-danger" type="button" onclick="removeHandler()">Remove selected</button>
+				</div>
+				<table id="tree"></table>
+				<div class="modal fade" id="addPlanModal" tabindex="-1" aria-labelledby="addPlanModalLabel" aria-hidden="true">
+					<div class="modal-dialog">
+						<div class="modal-content">
+							<div class="modal-header">
+								<h5 class="modal-title" id="addPlanModalLabel">Add test-plan</h5>
+								<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+							</div>
+							<div class="modal-body">
+								<table id="addPlanTable"></table>
+							</div>
+							<div class="modal-footer">
+								<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+								<button type="button" class="btn btn-primary" onclick="addPlanHandler()">Add</button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</form>
+
+			<button class="btn btn-success" type="button" data-bs-toggle="modal" data-bs-target="#saveModal">Save</button>
+			<div class="modal fade" id="saveModal" tabindex="-1" aria-labelledby="saveModalLabel" aria-hidden="true">
+				<div class="modal-dialog">
+					<div class="modal-content">
+						<div class="modal-header">
+							<h5 class="modal-title" id="saveModalLabel">Are you sure to save changes?</h5>
+							<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+						</div>
+						<div class="modal-footer">
+							<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+							<button type="button" class="btn btn-primary" onclick="submitHandler()">Save changes</button>
+						</div>
+					</div>
+				</div>
+			</div>
+			</form>
+		{% else %}
+			<p>You are not authorized</p>
+		{% endif %}
+	</div>
+{% endblock %}

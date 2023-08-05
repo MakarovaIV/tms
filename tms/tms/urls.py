@@ -18,7 +18,6 @@ from django.contrib import admin
 from django.urls import path
 from management_system import views
 
-
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.ProjectView.as_view(), name="index"),
@@ -52,4 +51,11 @@ urlpatterns = [
     path('plan/getsuits/', views.get_suits_to_add, name='getsuits'),
     path('plan/getcases/', views.get_cases_to_add, name='getcases'),
     path('plan/getusers/', views.get_list_of_users, name='get_list_of_users'),
+
+    path('reports/', views.ReportView.as_view(), name='reports'),
+    path('report/create/', views.ReportCreateView.as_view(), name='report_create'),
+    path('report/delete/<int:pk>/', views.delete_report, name='report_del'),
+    path('report/view/<int:pk>/', views.report_detail, name='report_detail'),
+    path('report/view/<int:pk>/', views.report_detail, name='report_detail'),
+    path('report/getplans/', views.get_list_of_plans, name='get_list_of_plans'),
 ]

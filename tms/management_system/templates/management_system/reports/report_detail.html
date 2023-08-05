@@ -1,0 +1,65 @@
+{% extends 'root.html' %}
+
+{% block content %}
+{% load static %}
+<style>
+	.chart {
+		margin: 2rem;
+		width: 90%;
+		min-height: 360px;
+	}
+</style>
+<script src="https://cdn.canvasjs.com/ga/canvasjs.stock.min.js"></script>
+<script src="https://cdn.canvasjs.com/ga/canvasjs.min.js"></script>
+<script>
+	window.onload = function () {
+		var planResult = new CanvasJS.Chart("planResult", {
+			theme: "light2",
+			animationEnabled: true,
+			exportEnabled: true,
+			title:{
+				text: "Test-plan results"
+			},
+			data: [{
+				type: "pie",
+				startAngle: -90,
+				yValueFormatString: "#,###'%'",
+				dataPoints: {{ datapoints | safe }}
+			}]
+		});
+
+		var assigneeResult = new CanvasJS.Chart("assigneeResult", {
+			  theme: "light2",
+			  animationEnabled: true,
+			  exportEnabled: true,
+			  title:{
+				text:"Assignee progress"
+			  },
+			  axisY2: [{
+				suffix: " number of cases",
+				labelAngle: 0,
+				interval: 1,
+				intervalType: "number"
+			  }],
+			  axisX: {
+				reversed: true,
+			  },
+			  data: [{
+				type: "bar",
+				yValueFormatString: "#.00",
+				axisYType: "secondary",
+				dataPoints: {{ assignee_results|safe }}
+			  }]
+		});
+
+		planResult.render();
+		assigneeResult.render();
+	}
+</script>
+	<div class="cards-wrapper">
+		<div class="chart" id="planResult"></div>
+		<div class="chart" id="assigneeResult"></div>
+	</div>
+
+
+{% endblock %}

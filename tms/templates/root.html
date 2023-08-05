@@ -104,6 +104,9 @@
 			<li class="nav-item">
                 <a class="nav-link" href="{% url 'plans' %}">Test-plans</a>
             </li>
+			<li class="nav-item">
+                <a class="nav-link" href="{% url 'reports' %}">Reports</a>
+            </li>
         </ul>
         <ul class="navbar-nav flex-row ml-md-auto d-none d-md-flex">
             {% if not user.is_authenticated %}
