@@ -41,7 +41,10 @@ class TCHistoryDetailView(DetailView):
         context = super().get_context_data(**kwargs)
         context["proj_id"] = get_object_or_404(Project, id=self.kwargs['proj_id']).id
         context["suit_id"] = get_object_or_404(Suit, id=self.kwargs['suit_id']).id
-        context["tc"] = get_object_or_404(TC, id=self.object.tc_id)
+        tc = get_object_or_404(TC, id=self.object.tc_id)
+        context["tc"] = tc
+        modified_by_id = get_object_or_404(CustomUser, id=tc.modified_by)
+        context["modified_by"] = modified_by_id
         return context
 
     def get_success_url(self):

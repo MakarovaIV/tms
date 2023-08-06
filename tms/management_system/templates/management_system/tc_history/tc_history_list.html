@@ -6,39 +6,21 @@
 {% endblock %}
 
 {% block content %}
-
 	<style>
-		.main {
-			display: flex;
-			flex-direction: column;
-			align-items: center;
-			flex-grow: 1;
+		.table {
+			margin: 1.5rem;
 		}
 
-		.proj {
-			border-bottom: 1px solid grey;
-			width: 100%;
+		th {
+			width: 10rem;
+			max-width: 10rem;
+			word-wrap: break-word;
 		}
 
-		.proj-div {
-			display: flex;
-			border-top: `px` solid grey;
-			gap: 1rem;
-		}
-
-		.proj-body {
-			flex-grow:1;
-		}
-
-		.page {
-			margin: 1rem 0;
-		}
-
-		footer {
-			position: fixed;
-			bottom: 0;
-			margin-left: 1rem;
-			margin-bottom: 1rem;
+		td {
+			width: 10rem;
+			max-width: 10rem;
+			word-wrap: break-word;
 		}
 
 		.tag {
@@ -47,37 +29,47 @@
 			padding: 0.25rem 0.5rem;
 			text-decoration: none;
 		}
-
-		.btn-back {
-			position: fixed;
-			margin-left: 1rem;
-			margin-bottom: 1rem;
-		}
 	</style>
-
 	{% if user.is_authenticated %}
-		<div class="btn-back">
+
+		{% if request.user.type == 'Tester' or request.user.type == 'Admin' or request.user.type == 'Owner' %}
+		<div class="btn-toolbar" role="toolbar">
 			<a href="{% url 'tc_update' proj_id=proj_id suit_id=suit_id pk=tc.pk %}" class="btn btn-secondary">
 				Back in {{ tc.name }}
 			</a>
 		</div>
-		<div class="main">
-		{% for tc in tc_history %}
-			<div class="proj-div">
-				<p>Version {{ tc.id }}</p>
-				<p>{{ tc.name }}</p>
-				<div>
-					<p>Author {{ tc.user.username }}</p>
-					<p>{{ tc.modification_date }}</p>
-					<p class="tag" >{{ tc.status }}</p>
-				</div>
-				<div>
-					<a href="{% url 'tc_history_detail' proj_id=proj_id suit_id=suit_id  pk=tc.pk %}" class="btn btn-info">
-						View
-					</a>
-				</div>
-			</div>
-		{% endfor %}
+		<table class="table">
+			<thead>
+				<tr>
+					<th scope="col">Version</th>
+					<th scope="col">TC Name</th>
+					<th scope="col">Author</th>
+					<th scope="col">Creation Date</th>
+					<th scope="col">Status</th>
+					<th scope="col">Modified by</th>
+					<th scope="col">Modification Date</th>
+					<th scope="col"> </th>
+				</tr>
+			</thead>
+			{% for tc in tc_history %}
+				<tbody>
+					<tr>
+						<td scope="row">{{ tc.id }}</td>
+						<td>
+							<a href="{% url 'tc_history_detail' proj_id=proj_id suit_id=suit_id pk=tc.pk %}" class="card-title">{{ tc.name }}</a>
+						</td>
+						<td>{{ tc.user.username }}</td>
+						<td>{{ tc.creation_date }}</td>
+						<td>{{ tc.status }}</td>
+						<td>{{ modified_by.username }}</td>
+						<td>{{ tc.modification_date }}</td>
+						<td>
+							<a href="{% url 'tc_history_detail' proj_id=proj_id suit_id=suit_id pk=tc.pk %}" class="btn btn-info">View</a>
+						</td>
+					</tr>
+				</tbody>
+			{% endfor %}
+		</table>
         <nav aria-label="Page navigation example" class="page">
         <ul class="pagination">
             {% if page_obj.has_previous %}
@@ -119,8 +111,12 @@
             {% endif %}
         </ul>
     </nav>
-    </div>
 
+		{% else %}
+			<div class="alert alert-warning" role="alert" style="width: 100%">
+				You do not have permissions
+			</div>
+		{% endif %}
 	{% else %}
 		<div class="alert alert-warning" role="alert" style="width: 100%">
 			You are not authorized

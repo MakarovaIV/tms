@@ -2,9 +2,16 @@
 
 {% block content %}
 <style>
+	.case-wrapper {
+		margin: 1.5rem;
+		width: 95%;
+	}
+
 	.steps-wrapper {
 		display: flex;
 		flex-direction: column;
+		width: 100%;
+		margin-bottom: 1rem;
 	}
 
 	.step {
@@ -13,41 +20,83 @@
 		gap: 1rem;
 		margin-top: 1rem;
 	}
+
+	.row {
+		width: 100%;
+		margin-bottom: 1rem;
+	}
+
+	form {
+		width: 100%;
+	}
+
 </style>
 {% if user.is_authenticated %}
 	<div class="form-wrapper">
-		<div class="btn-back">
+
+	<form action="{% url 'tc_history_recover' proj_id=proj_id suit_id=suit_id tc_id=tc.id pk=tc_history_detail.id %}" method="post">
+		{% csrf_token %}
+		<div class="btn-toolbar" role="toolbar">
 			<a href="{% url 'tc_history' proj_id=proj_id suit_id=suit_id pk=tc.id %}" class="btn btn-secondary">
 				Back in {{ tc_history_detail.name }}
 			</a>
-		</div>
-
-		<form action="{% url 'tc_history_recover' proj_id=proj_id suit_id=suit_id tc_id=tc.id pk=tc_history_detail.id %}" method="post">
-
 			{% if request.user.type == 'Tester' or request.user.type == 'Admin' or request.user.type == 'Owner' %}
 				<button class="btn btn-outline-secondary" type="submit" >Recover version {{ tc_history_detail.id }}</button>
 			{% endif %}
-			<h3>Version {{ tc_history_detail.id }}</h3>
+		</div>
 
-			{% csrf_token %}
+		<div class="case-wrapper">
+			<input name="user_id" value="{{ user_id }}" class="invisible"/>
+			<input name="proj_id" value="{{ proj_id }}" class="invisible"/>
+			<input name="suit_id" value="{{ suit_id }}" class="invisible"/>
+			<input name="steps" class="invisible"/>
+			<h3>Version {{ tc_history_detail.id }}</h3>
+			<div class="form-with-fields">
 				<input name="user_id" value="{{ user_id }}" class="invisible"/>
 				<input name="proj_id" value="{{ proj_id }}" class="invisible"/>
 				<input name="suit_id" value="{{ suit_id }}" class="invisible"/>
 				<input name="steps" class="invisible"/>
-				<p>{{ tc_history_detail.name }}</p>
-				<p>{{ tc_history_detail.desc }}</p>
-				<div class="steps-wrapper" id="stepsWrapper">
-					{% for step in tc_history_detail.steps %}
-						<div class="step" data-index="{{ step.index }}">
-							<p class="step_number">{{ step.index }}</p>
-							<p>{{ step.step_name }}</p>
-							<p>{{ step.step_value }}</p>
-						</div>
-					{% endfor %}
-				</div>
-				<p name="status">{{ tc_history_detail.status }}</p>
-		</form>
-	</div>
+				<p class="field-wrapper">
+					<label>Test-case name: </label>
+					<label>{{ tc_history_detail.name }}</label>
+				</p>
+				<p class="field-wrapper">
+					<label>Description: </label>
+					<label>{{ tc_history_detail.desc }}</label>
+				</p>
+				<p class="field-wrapper">
+					<label>Created by: </label>
+					<label>{{ tc.user.username }}</label>
+				</p>
+				<p class="field-wrapper">
+					<label>Modified by: </label>
+					<label>{{ modified_by.username }}</label>
+				</p>
+				<p class="field-wrapper">
+					<label>Creation date: </label>
+					<label>{{ tc.creation_date }}</label>
+				</p>
+				<p class="field-wrapper">
+					<label>Modification date: </label>
+					<label>{{ tc.modification_date }}</label>
+				</p>
+				<p class="field-wrapper">
+					<label>Status:</label>
+					<label>{{ tc_history_detail.status }}</label>
+				</p>
+			</div>
+			<div class="steps-wrapper" id="stepsWrapper">
+				{% for step in tc_history_detail.steps %}
+					<div class="step" data-index="{{ step.index }}">
+						<label class="step_number">{{ step.index }}</label>
+						<label class="form-control" name="step_name" data-index="{{ step.index }}">{{ step.step_name }}</label>
+						<label class="form-control" name="step_value" data-index="{{ step.index }}">{{ step.step_value }}</label>
+					</div>
+				{% endfor %}
+			</div>
+
+	</form>
+</div>
 {% else %}
 	<div class="alert alert-warning" role="alert" style="width: 100%">
 		You are not authorized

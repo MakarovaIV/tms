@@ -64,28 +64,17 @@ class TestCaseCreateView(CreateView):
         suit = get_object_or_404(Suit, id=self.kwargs['suit_id'])
         form.instance.suit = suit
         form.save()
-        name = form.instance.name
-        desc = form.instance.desc
-        modified_by = form.instance.modified_by
-        status = form.instance.status
-        steps = form.instance.steps
-        creation_date = form.instance.creation_date
-        modification_date = form.instance.modification_date
-        proj_id = form.instance.proj_id
-        suit_id = form.instance.suit_id
-        tc_id = form.instance.id
-        user_id = form.instance.user_id
-        TCHistory.objects.create(name=name,
-                                 desc=desc,
-                                 modified_by=modified_by,
-                                 status=status,
-                                 steps=steps,
-                                 creation_date=creation_date,
-                                 modification_date=modification_date,
-                                 proj_id=proj_id,
-                                 suit_id=suit_id,
-                                 tc_id=tc_id,
-                                 user_id=user_id)
+        TCHistory.objects.create(name=form.instance.name,
+                                 desc=form.instance.desc,
+                                 modified_by=form.instance.modified_by,
+                                 status=form.instance.status,
+                                 steps=form.instance.steps,
+                                 creation_date=form.instance.creation_date,
+                                 modification_date=form.instance.modification_date,
+                                 proj_id=form.instance.proj_id,
+                                 suit_id=form.instance.suit_id_id,
+                                 tc_id=form.instance.id,
+                                 user_id=form.instance.user_id)
         return super(TestCaseCreateView, self).form_valid(form)
 
     def form_invalid(self, form):
@@ -116,35 +105,25 @@ class TestCaseUpdate(UpdateView):
         return context
 
     def form_valid(self, form):
-        form.instance.user = self.request.user
+        case = get_object_or_404(TC, id=self.kwargs['pk'])
+        form.instance.user = get_object_or_404(CustomUser, id=case.user_id)
         form.instance.modified_by = self.request.user.id
         project = get_object_or_404(Project, id=self.kwargs['proj_id'])
         form.instance.proj = project
         suit = get_object_or_404(Suit, id=self.kwargs['suit_id'])
         form.instance.suit = suit
         form.save()
-        name = form.instance.name
-        desc = form.instance.desc
-        modified_by = form.instance.modified_by
-        status = form.instance.status
-        steps = form.instance.steps
-        creation_date = form.instance.creation_date
-        modification_date = form.instance.modification_date
-        proj_id = form.instance.proj_id
-        suit_id = form.instance.suit_id
-        tc_id = form.instance.id
-        user_id = form.instance.user_id
-        TCHistory.objects.create(name=name,
-                                 desc=desc,
-                                 modified_by=modified_by,
-                                 status=status,
-                                 steps=steps,
-                                 creation_date=creation_date,
-                                 modification_date=modification_date,
-                                 proj_id=proj_id,
-                                 suit_id=suit_id,
-                                 tc_id=tc_id,
-                                 user_id=user_id)
+        TCHistory.objects.create(name=form.instance.name,
+                                 desc=form.instance.desc,
+                                 modified_by=self.request.user.id,
+                                 status=form.instance.status,
+                                 steps=form.instance.steps,
+                                 creation_date=form.instance.creation_date,
+                                 modification_date=form.instance.modification_date,
+                                 proj_id=form.instance.proj_id,
+                                 suit_id=form.instance.suit_id,
+                                 tc_id=form.instance.id,
+                                 user_id=case.user_id)
         return super(TestCaseUpdate, self).form_valid(form)
 
     def form_invalid(self, form):
