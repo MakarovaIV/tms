@@ -126,7 +126,8 @@ class TestPlanCreateForm(forms.ModelForm):
     proj = forms.JSONField(error_messages={'required': 'Field proj is invalid'}, required=False)
     suit = forms.JSONField(error_messages={'required': 'Field suit is invalid'}, required=False)
     tc = forms.JSONField(error_messages={'required': 'Field tc is invalid'}, required=False)
-    status = forms.ChoiceField(choices=TP_STATUS, error_messages={'required': 'Field status is invalid'}, required=False)
+    status = forms.ChoiceField(choices=TP_STATUS, error_messages={'required': 'Field status is invalid'},
+                               required=False)
 
     class Meta:
         model = TP

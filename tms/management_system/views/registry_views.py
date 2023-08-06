@@ -72,4 +72,3 @@ def get_user_image(request, pk):
         extension = matches.group(1) if matches else "jpeg"
         content_type = "image/" + extension
         return HttpResponse(picture_data, content_type=content_type)
-

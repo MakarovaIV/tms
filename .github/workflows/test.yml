@@ -1,0 +1,31 @@
+name: Run unittests for TMS
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up Python 3.10
+      uses: actions/setup-python@v3
+      with:
+        python-version: "3.10"
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r ./requirements.txt
+    - name: Run linter Flake8
+      run: |
+        flake8 -v
+    - name: Create DB
+      run: |
+        docker run --name pg_db -p 5432:5432 -e POSTGRES_USER=testuser -e POSTGRES_PASSWORD=test_password -e POSTGRES_DB=test_db -d postgres:15.2
+    - name: Sleep for 10 seconds
+      run: sleep 10s
+      shell: bash
+    - name: Run test
+      run: |
+        cd tms
+        coverage run manage.py test
+        coverage report

@@ -1,6 +1,16 @@
 asgiref==3.7.2
+certifi==2023.7.22
+charset-normalizer==3.2.0
+coverage==7.2.7
 Django==4.2.3
 django-environ==0.10.0
+flake8==6.1.0
+idna==3.4
+mccabe==0.7.0
 psycopg2-binary==2.9.6
+pycodestyle==2.11.0
+pyflakes==3.1.0
+requests==2.31.0
 sqlparse==0.4.4
 typing_extensions==4.7.1
+urllib3==2.0.4

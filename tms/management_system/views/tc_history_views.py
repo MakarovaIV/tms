@@ -61,8 +61,7 @@ class TCHistoryDetailView(DetailView):
                                                          'tc': self.object.tc_id})
 
 
-def recover_tc(request, proj_id, suit_id, tc_id, pk):
-    data = request.POST.copy()
+def recover_tc(request, pk):
     if request.user.is_authenticated:
         tc = TCHistory.objects.filter(pk=pk).get()
         name = tc.name

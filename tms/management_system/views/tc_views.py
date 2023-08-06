@@ -144,6 +144,11 @@ class TestCaseDetail(DetailView):
     model = TC
     template_name = 'management_system/test_cases/test_cases_detail.html'
 
+    def get_success_url(self):
+        return reverse_lazy('tc_detail', kwargs={'proj_id': self.kwargs['proj_id'],
+                                                 'suit_id': self.kwargs['suit_id'],
+                                                 'pk': self.kwargs['pk']})
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["user_id"] = self.request.user.id

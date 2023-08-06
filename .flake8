@@ -1,0 +1,21 @@
+[flake8]
+exclude =
+    .git,
+    .gitignore,
+    *.pot,
+    *.py[co],
+    __pycache__,
+    venv,
+    .env,
+    tms,
+    tms/management_system/migrations,
+    tms/management_system/templates,
+    tms/management_system/models,
+    tms/management_system/test_views,
+    tms/management_system/views,
+    tms/management_system/tests,
+
+ignore=
+    E722
+
+max-line-length = 120
