@@ -7,7 +7,7 @@
 {% block content %}
 	{% if user.is_authenticated %}
 		{% if request.user.type == 'Tester' or request.user.type == 'Admin' or request.user.type == 'Owner' %}
-			<div class="btn-toolbar" role="toolbar">
+			<div class="btn-toolbar btn-right" role="toolbar">
 				<a href="{% url 'report_create' %}" class="btn btn-secondary">
 					New report
 				</a>

@@ -19,8 +19,12 @@ class TCHistoryView(ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["user_id"] = self.request.user.id
-        context["proj_id"] = get_object_or_404(Project, id=self.kwargs['proj_id']).id
-        context["suit_id"] = get_object_or_404(Suit, id=self.kwargs['suit_id']).id
+        proj = get_object_or_404(Project, id=self.kwargs['proj_id'])
+        suit = get_object_or_404(Suit, id=self.kwargs['suit_id'])
+        context["proj_id"] = proj.id or None
+        context["suit_id"] = suit.id or None
+        context["proj_name"] = proj.name or None
+        context["suit_name"] = suit.name or None
         tc = get_object_or_404(TC, id=self.kwargs['pk'])
         modified_by_id = get_object_or_404(CustomUser, id=tc.modified_by)
         context["tc"] = tc
@@ -39,8 +43,12 @@ class TCHistoryDetailView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["proj_id"] = get_object_or_404(Project, id=self.kwargs['proj_id']).id
-        context["suit_id"] = get_object_or_404(Suit, id=self.kwargs['suit_id']).id
+        proj = get_object_or_404(Project, id=self.kwargs['proj_id'])
+        suit = get_object_or_404(Suit, id=self.kwargs['suit_id'])
+        context["proj_id"] = proj.id or None
+        context["suit_id"] = suit.id or None
+        context["proj_name"] = proj.name or None
+        context["suit_name"] = suit.name or None
         tc = get_object_or_404(TC, id=self.object.tc_id)
         context["tc"] = tc
         modified_by_id = get_object_or_404(CustomUser, id=tc.modified_by)

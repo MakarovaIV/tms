@@ -33,10 +33,15 @@
 	{% if user.is_authenticated %}
 
 		{% if request.user.type == 'Tester' or request.user.type == 'Admin' or request.user.type == 'Owner' %}
-		<div class="btn-toolbar" role="toolbar">
-			<a href="{% url 'tc_update' proj_id=proj_id suit_id=suit_id pk=tc.pk %}" class="btn btn-secondary">
-				Back in {{ tc.name }}
-			</a>
+		<div class="nav-wrapper">
+			<nav aria-label="breadcrumb" class="custom-breadcrumb">
+				<ol class="breadcrumb">
+					<li class="breadcrumb-item"><a href="{% url 'projects' %}">Project {{ proj_name }}</a></li>
+					<li class="breadcrumb-item"><a href="{% url 'suits' pk=proj_id %}">Suit {{ suit_name }}</a></li>
+					<li class="breadcrumb-item"><a href="{% url 'tc_update' proj_id=proj_id suit_id=suit_id pk=tc.id %}">Case {{ tc.name }}</a></li>
+					<li class="breadcrumb-item active" aria-current="page">Case history</li>
+				</ol>
+			</nav>
 		</div>
 		<table class="table">
 			<thead>

@@ -32,10 +32,16 @@
 	</style>
 
 {% if user.is_authenticated %}
+	<div class="nav-wrapper">
+		<nav aria-label="breadcrumb" class="custom-breadcrumb">
+			<ol class="breadcrumb">
+				<li class="breadcrumb-item"><a href="{% url 'projects' %}">Project {{ proj_name }}</a></li>
+				<li class="breadcrumb-item"><a href="{% url 'suits' pk=proj_id %}">Suit {{ suit_name }}</a></li>
+				<li class="breadcrumb-item active" aria-current="page">Cases</li>
+			</ol>
+		</nav>
+	</div>
 	<div class="btn-toolbar" role="toolbar">
-		<a href="{% url 'suits' pk=proj_id %}" class="btn btn-secondary">
-			Back in suits
-		</a>
 		{% if request.user.type == 'Tester' or request.user.type == 'Admin' or request.user.type == 'Owner' %}
 			<a href="{% url 'tc_create' proj_id=proj_id suit_id=suit_id %}" class="btn btn-secondary" >
 				New test-case

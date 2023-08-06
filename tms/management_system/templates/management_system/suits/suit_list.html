@@ -6,15 +6,20 @@
 
 {% block content %}
 	{% if user.is_authenticated %}
-		<div class="btn-toolbar" role="toolbar">
-			<a href="{% url 'projects'%}" class="btn btn-secondary">
-				Back in projects
-			</a>
-			{% if request.user.type == 'Tester' or request.user.type == 'Admin' or request.user.type == 'Owner' %}
-				<a href="{% url 'suit_create' proj_id=proj_id %}" class="btn btn-secondary" >
-					New suit
-				</a>
-			{% endif %}
+		<div class="nav-wrapper">
+			<nav aria-label="breadcrumb" class="custom-breadcrumb">
+				<ol class="breadcrumb">
+					<li class="breadcrumb-item"><a href="{% url 'projects' %}">Projects {{ proj_name }}</a></li>
+					<li class="breadcrumb-item active" aria-current="page">Suits</li>
+				</ol>
+			</nav>
+			<div class="btn-toolbar" role="toolbar">
+				{% if request.user.type == 'Tester' or request.user.type == 'Admin' or request.user.type == 'Owner' %}
+					<a href="{% url 'suit_create' proj_id=proj_id %}" class="btn btn-secondary" >
+						New suit
+					</a>
+				{% endif %}
+			</div>
 		</div>
 
     	<div class="row cards-wrapper">

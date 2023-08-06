@@ -134,13 +134,22 @@
 		updateIndexes();
 	};
 </script>
-	<div class="form-wrapper">
-		{% if user.is_authenticated %}
-		<div class="btn-toolbar" role="toolbar">
-			<a href="{% url 'test_cases' proj_id=proj_id suit_id=suit_id %}" class="btn btn-secondary">
-				Back in test-cases
-			</a>
+	{% if user.is_authenticated %}
+		<div class="nav-wrapper">
+			<nav aria-label="breadcrumb" class="custom-breadcrumb">
+				<ol class="breadcrumb">
+					<li class="breadcrumb-item"><a href="{% url 'projects' %}">Project {{ proj_name }}</a></li>
+					<li class="breadcrumb-item"><a href="{% url 'test_cases' proj_id=proj_id suit_id=suit_id %}">Suit {{ suit_name }}</a></li>
+
+					{% if tc and tc.pk %}
+						<li class="breadcrumb-item active" aria-current="page">Edit test-case {{ tc.name }}</li>
+					{% else %}
+						<li class="breadcrumb-item active" aria-current="page">New test-case</li>
+					{% endif %}
+				</ol>
+			</nav>
 		</div>
+		<div class="form-wrapper">
 		{% if request.user.type == 'Tester' or request.user.type == 'Admin' or request.user.type == 'Owner' %}
 			<div class="case-wrapper">
 				<div class="row">

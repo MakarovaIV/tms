@@ -82,7 +82,8 @@ def report_detail(request, pk):
     return render(request,
                   'management_system/reports/report_detail.html',
                   {"datapoints": datapoints,
-                   "assignee_results": assignee_results})
+                   "assignee_results": assignee_results,
+                   "report": report})
 
 
 def get_list_of_plans(request):

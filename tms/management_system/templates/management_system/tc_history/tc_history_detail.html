@@ -32,20 +32,29 @@
 
 </style>
 {% if user.is_authenticated %}
+	<div class="nav-wrapper">
+		<nav aria-label="breadcrumb" class="custom-breadcrumb">
+			<ol class="breadcrumb">
+				<li class="breadcrumb-item"><a href="{% url 'projects' %}">Project {{ proj_name }}</a></li>
+				<li class="breadcrumb-item"><a href="{% url 'suits' pk=proj_id %}">Suit {{ suit_name }}</a></li>
+				<li class="breadcrumb-item"><a href="{% url 'tc_history' proj_id=proj_id suit_id=suit_id pk=tc.id %}">Case {{ tc_history_detail.name }}</a></li>
+				<li class="breadcrumb-item active" aria-current="page">Case history v{{ tc_history_detail.id }}</li>
+			</ol>
+		</nav>
+	</div>
 	<div class="form-wrapper">
+		<form action="{% url 'tc_history_recover' proj_id=proj_id suit_id=suit_id tc_id=tc.id pk=tc_history_detail.id %}" method="post">
+			{% csrf_token %}
+			<div class="btn-toolbar" role="toolbar">
+				<a href="{% url 'tc_history' proj_id=proj_id suit_id=suit_id pk=tc.id %}" class="btn btn-secondary">
+					Back in {{ tc_history_detail.name }}
+				</a>
+				{% if request.user.type == 'Tester' or request.user.type == 'Admin' or request.user.type == 'Owner' %}
+					<button class="btn btn-outline-secondary" type="submit" >Recover version {{ tc_history_detail.id }}</button>
+				{% endif %}
+			</div>
 
-	<form action="{% url 'tc_history_recover' proj_id=proj_id suit_id=suit_id tc_id=tc.id pk=tc_history_detail.id %}" method="post">
-		{% csrf_token %}
-		<div class="btn-toolbar" role="toolbar">
-			<a href="{% url 'tc_history' proj_id=proj_id suit_id=suit_id pk=tc.id %}" class="btn btn-secondary">
-				Back in {{ tc_history_detail.name }}
-			</a>
-			{% if request.user.type == 'Tester' or request.user.type == 'Admin' or request.user.type == 'Owner' %}
-				<button class="btn btn-outline-secondary" type="submit" >Recover version {{ tc_history_detail.id }}</button>
-			{% endif %}
-		</div>
-
-		<div class="case-wrapper">
+			<div class="case-wrapper">
 			<input name="user_id" value="{{ user_id }}" class="invisible"/>
 			<input name="proj_id" value="{{ proj_id }}" class="invisible"/>
 			<input name="suit_id" value="{{ suit_id }}" class="invisible"/>
@@ -95,8 +104,8 @@
 				{% endfor %}
 			</div>
 
-	</form>
-</div>
+		</form>
+	</div>
 {% else %}
 	<div class="alert alert-warning" role="alert" style="width: 100%">
 		You are not authorized

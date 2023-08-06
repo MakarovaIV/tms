@@ -40,7 +40,9 @@ class SuitCreateView(CreateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["user_id"] = self.request.user.id
-        context["proj_id"] = get_object_or_404(Project, id=self.kwargs['proj_id']).id
+        proj = get_object_or_404(Project, id=self.kwargs['proj_id'])
+        context["proj_id"] = proj.id
+        context["proj_name"] = proj.name or None
         cleaned_data = kwargs["form"].cleaned_data if "form" in kwargs else None
         if cleaned_data:
             context["name"] = cleaned_data['name'] if "name" in cleaned_data else ""

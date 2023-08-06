@@ -23,14 +23,15 @@ class TestCaseView(ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["user_id"] = self.request.user.id
-        project = get_object_or_404(Project, id=self.kwargs['proj_id'])
+        proj = get_object_or_404(Project, id=self.kwargs['proj_id'])
         suit = get_object_or_404(Suit, id=self.kwargs['suit_id'])
+        context["proj_id"] = proj.id or None
+        context["suit_id"] = suit.id or None
+        context["proj_name"] = proj.name or None
+        context["suit_name"] = suit.name or None
         context['modified_users'] = []
         for test_case in context['test_cases']:
             test_case.modified_by = get_object_or_404(CustomUser, id=test_case.modified_by).username
-        context["proj_id"] = project.id or None
-        context["suit_id"] = suit.id or None
-        context["suit_name"] = suit.name or None
         return context
 
 
@@ -45,8 +46,12 @@ class TestCaseCreateView(CreateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["user_id"] = self.request.user.id
-        context["proj_id"] = get_object_or_404(Project, id=self.kwargs['proj_id']).id
-        context["suit_id"] = get_object_or_404(Suit, id=self.kwargs['suit_id']).id
+        proj = get_object_or_404(Project, id=self.kwargs['proj_id'])
+        suit = get_object_or_404(Suit, id=self.kwargs['suit_id'])
+        context["proj_id"] = proj.id or None
+        context["suit_id"] = suit.id or None
+        context["proj_name"] = proj.name or None
+        context["suit_name"] = suit.name or None
         context["steps"] = [{"index": 0, "step_name": "Step name", "step_value": "Expected result"}]
         cleaned_data = kwargs["form"].cleaned_data if "form" in kwargs else None
         if cleaned_data:
@@ -93,8 +98,12 @@ class TestCaseUpdate(UpdateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["user_id"] = self.request.user.id
-        context["proj_id"] = get_object_or_404(Project, id=self.kwargs['proj_id']).id
-        context["suit_id"] = get_object_or_404(Suit, id=self.kwargs['suit_id']).id
+        proj = get_object_or_404(Project, id=self.kwargs['proj_id'])
+        suit = get_object_or_404(Suit, id=self.kwargs['suit_id'])
+        context["proj_id"] = proj.id or None
+        context["suit_id"] = suit.id or None
+        context["proj_name"] = proj.name or None
+        context["suit_name"] = suit.name or None
         tc = get_object_or_404(TC, id=self.kwargs['pk'])
         modified_by_id = get_object_or_404(CustomUser, id=tc.modified_by)
         context["name"] = tc.name
@@ -138,8 +147,12 @@ class TestCaseDetail(DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["user_id"] = self.request.user.id
-        context["proj_id"] = get_object_or_404(Project, id=self.kwargs['proj_id']).id
-        context["suit_id"] = get_object_or_404(Suit, id=self.kwargs['suit_id']).id
+        proj = get_object_or_404(Project, id=self.kwargs['proj_id'])
+        suit = get_object_or_404(Suit, id=self.kwargs['suit_id'])
+        context["proj_id"] = proj.id or None
+        context["suit_id"] = suit.id or None
+        context["proj_name"] = proj.name or None
+        context["suit_name"] = suit.name or None
         tc = get_object_or_404(TC, id=self.kwargs['pk'])
         modified_by_id = get_object_or_404(CustomUser, id=tc.modified_by)
         context["name"] = tc.name
