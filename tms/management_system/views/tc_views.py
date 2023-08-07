@@ -59,6 +59,7 @@ class TestCaseCreateView(CreateView):
             context["desc"] = cleaned_data['desc'] if "desc" in cleaned_data else ""
             context["steps"] = cleaned_data['steps'] if "steps" in cleaned_data else ""
             context["status"] = cleaned_data['status'] if "status" in cleaned_data else "DRAFT"
+            context["priority"] = cleaned_data['priority'] if "priority" in cleaned_data else "MEDIUM"
         return context
 
     def form_valid(self, form):
@@ -73,11 +74,12 @@ class TestCaseCreateView(CreateView):
                                  desc=form.instance.desc,
                                  modified_by=form.instance.modified_by,
                                  status=form.instance.status,
+                                 priority=form.instance.priority,
                                  steps=form.instance.steps,
                                  creation_date=form.instance.creation_date,
                                  modification_date=form.instance.modification_date,
                                  proj_id=form.instance.proj_id,
-                                 suit_id=form.instance.suit_id_id,
+                                 suit_id=form.instance.suit_id,
                                  tc_id=form.instance.id,
                                  user_id=form.instance.user_id)
         return super(TestCaseCreateView, self).form_valid(form)
@@ -110,6 +112,7 @@ class TestCaseUpdate(UpdateView):
         context["desc"] = tc.desc
         context["steps"] = tc.steps
         context["status"] = tc.status
+        context["priority"] = tc.priority
         context["modified_by"] = modified_by_id
         return context
 
@@ -126,6 +129,7 @@ class TestCaseUpdate(UpdateView):
                                  desc=form.instance.desc,
                                  modified_by=self.request.user.id,
                                  status=form.instance.status,
+                                 priority=form.instance.priority,
                                  steps=form.instance.steps,
                                  creation_date=form.instance.creation_date,
                                  modification_date=form.instance.modification_date,
@@ -164,6 +168,7 @@ class TestCaseDetail(DetailView):
         context["desc"] = tc.desc
         context["steps"] = tc.steps
         context["status"] = tc.status
+        context["priority"] = tc.priority
         context["modified_by"] = modified_by_id
         return context
 

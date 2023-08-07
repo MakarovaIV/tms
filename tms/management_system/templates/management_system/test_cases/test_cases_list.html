@@ -54,6 +54,7 @@
 				<th scope="col">#</th>
 				<th scope="col">TC Name</th>
 				<th scope="col">TC Description</th>
+				<th scope="col">Priority</th>
 				<th scope="col">Status</th>
 				<th scope="col">Created by</th>
 				<th scope="col">Creation Date</th>
@@ -75,6 +76,7 @@
 						{% endif %}
 					</td>
 					<td>{{ tc.desc }}</td>
+					<td>{{ tc.priority }}</td>
 					<td>{{ tc.status }}</td>
 					<td>{{ tc.user.username }}</td>
 					<td>{{ tc.creation_date }}</td>

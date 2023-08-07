@@ -16,7 +16,7 @@
 			</nav>
 		</div>
 		<div class="form-wrapper">
-			{% if request.user.type == 'Tester' or request.user.type == 'Admin' or request.user.type == 'Owner' %}
+			{% if request.user.type == 'Admin' or request.user.type == 'Owner' %}
 			{% if project and project.pk %}
 				<form class="form-with-fields" action="{% url 'project_update' pk=project.pk %}" method="post">
 					<h3>Edit project</h3>

@@ -10,6 +10,11 @@ TC_STATUS = [
     ("DRAFT", "DRAFT"),
     ("OUTDATED", "OUTDATED"),
 ]
+TC_PRIORITY = [
+    ("HIGH", "HIGH"),
+    ("MEDIUM", "MEDIUM"),
+    ("LOW", "LOW"),
+]
 
 
 class TC(models.Model):
@@ -21,6 +26,7 @@ class TC(models.Model):
     suit = models.ForeignKey(Suit, on_delete=models.CASCADE)
     status = models.CharField(choices=TC_STATUS, default="DRAFT")
     steps = models.JSONField(blank=True)
+    priority = models.CharField(choices=TC_PRIORITY, default="MEDIUM")
     creation_date = models.DateTimeField(auto_now_add=True)
     modification_date = models.DateTimeField(auto_now=True)
 

@@ -41,7 +41,7 @@ class TestProjectListView(TestCase):
         self.customuser.delete()
 
     def test_project_list(self):
-        response = self.client.get('/projects/')
+        response = self.client.get('')
         self.assertTemplateUsed(response, template_name='management_system/projects/project_list.html')
 
 

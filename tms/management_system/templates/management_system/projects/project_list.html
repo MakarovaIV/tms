@@ -6,7 +6,7 @@
 
 {% block content %}
 	{% if user.is_authenticated %}
-		{% if request.user.type == 'Tester' or request.user.type == 'Admin' or request.user.type == 'Owner' %}
+		{% if request.user.type == 'Admin' or request.user.type == 'Owner' %}
 			<div class="btn-toolbar btn-right" role="toolbar">
 				<a href="{% url 'project_create' %}" class="btn btn-secondary">
 					New project
@@ -26,7 +26,7 @@
 					<p>Creation date: {{project.creation_date}}</p>
 
 
-					{% if request.user.type == 'Tester' or request.user.type == 'Admin' or request.user.type == 'Owner' %}
+					{% if request.user.type == 'Admin' or request.user.type == 'Owner' %}
 						<a href="{% url 'project_update' pk=project.pk %}" class="btn btn-secondary">
 							Edit
 						</a>

@@ -196,11 +196,19 @@
 						{% endif %}
 
 						<p class="field-wrapper">
-							<label for="Desc">Description</label>
+							<label for="Desc">Description: </label>
 							<textarea class="form-control" name="desc" id="Desc">{{ desc }}</textarea>
 						</p>
 						<p class="field-wrapper">
-							<label for="Status">Status</label>
+							<label for="Priority">Priority: </label>
+							<select class="form-select form-select-md mb-3" name="priority" id="Priority">
+								<option {% if 'HIGH' == priority %} selected {% endif %}>HIGH</option>
+								<option {% if 'MEDIUM' == priority %} selected {% endif %}>MEDIUM</option>
+								<option {% if 'LOW' == priority %} selected {% endif %}>LOW</option>
+							</select>
+						</p>
+						<p class="field-wrapper">
+							<label for="Status">Status: </label>
 							<select class="form-select form-select-md mb-3" name="status" id="Status">
 								<option {% if 'DRAFT' == status %} selected {% endif %}>DRAFT</option>
 								<option {% if 'ACTIVE' == status %} selected {% endif %}>ACTIVE</option>

@@ -30,6 +30,12 @@ TC_IN_TP_STATUS = [
     ("SKIPPED", "SKIPPED"),
 ]
 
+TC_PRIORITY = [
+    ("HIGH", "HIGH"),
+    ("MEDIUM", "MEDIUM"),
+    ("LOW", "LOW"),
+]
+
 
 class CustomUserCreationForm(UserCreationForm):
 
@@ -104,6 +110,7 @@ class TestCaseCreateForm(forms.ModelForm):
     proj_id = forms.IntegerField(required=False)
     suit_id = forms.IntegerField(required=False)
     status = forms.ChoiceField(choices=TC_STATUS)
+    priority = forms.ChoiceField(choices=TC_PRIORITY)
     steps = forms.JSONField(required=False)
 
     class Meta:
@@ -115,6 +122,7 @@ class TestCaseCreateForm(forms.ModelForm):
                   'proj_id',
                   'suit_id',
                   'status',
+                  'priority',
                   'steps']
 
 
