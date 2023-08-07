@@ -62,7 +62,7 @@ ROOT_URLCONF = 'tms.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': ['templates', 'management_system/templates'],
+        'DIRS': ['templates', 'management_system/templates', 'tms/templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [

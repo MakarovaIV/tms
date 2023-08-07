@@ -6,6 +6,7 @@ Stack:
 - Django 4
 - Bootstrap 5
 - JQuery 3.7
+- Docker compose
 
 Role model contains 'Owner', 'Developer' and 'Tester'. 
 'Owner' has full access to all objects.
@@ -17,7 +18,18 @@ Features:
 - Create test-plans
 - Create reports based on test-plans results
 
-## Run app
+
+## Run app in docker
+- Clone repo
+- Execute command
+```commandline
+docker compose up
+```
+
+Open in browser http://127.0.0.1:8000/
+
+
+## Run app for develop
 - Clone repo
 - Install requirements
 ```commandline

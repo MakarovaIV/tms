@@ -1,0 +1,45 @@
+version: '2.0'
+
+services:
+  db:
+    restart: "no"
+    build:
+      context: .
+      dockerfile: ./deploy/db/Dockerfile
+    environment:
+      POSTGRES_PASSWORD: 'pg_password'
+      POSTGRES_USER: 'postgres'
+      POSTGRES_DB: 'postgres'
+      APP_DB_USER: 'testuser'
+      APP_DB_NAME: 'test_db'
+      APP_DB_PASSWORD: 'test_password'
+    container_name: 'db'
+    volumes:
+      - ./data:/var/lib/postgresql/data:z
+    ports:
+      - "5432:5432"
+    networks:
+      - djangonetwork
+  app:
+    build:
+      context: .
+      dockerfile: ./deploy/tms/Dockerfile
+    ports:
+      - "8000:80"
+    environment:
+      - DB_HOST=db
+    command: bash -c "/app/deploy/tms/start.sh"
+    container_name: 'management_system'
+    depends_on:
+      - db
+    links:
+      - db:db
+    networks:
+      - djangonetwork
+
+volumes:
+  db-data:
+
+networks:
+  djangonetwork:
+    driver: bridge
