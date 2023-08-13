@@ -61,7 +61,7 @@ class TCHistoryDetailView(DetailView):
                                                          'tc': self.object.tc_id})
 
 
-def recover_tc(request, pk):
+def recover_tc(request, proj_id, suit_id, tc_id, pk):
     if request.user.is_authenticated:
         tc = TCHistory.objects.filter(pk=pk).get()
         name = tc.name
@@ -71,8 +71,6 @@ def recover_tc(request, pk):
         steps = tc.steps
         creation_date = tc.creation_date
         modification_date = tc.modification_date
-        proj_id = tc.proj_id
-        suit_id = tc.suit_id
         user_id = tc.user_id
         TC.objects.filter(pk=tc.tc_id).update(name=name,
                                               desc=desc,

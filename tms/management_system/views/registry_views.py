@@ -1,6 +1,7 @@
 import os
 import re
 import shutil
+from pathlib import Path
 
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
@@ -10,6 +11,7 @@ from django.shortcuts import render, redirect
 
 from ..forms import SignUpForm
 from ..models import CustomUser
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
 
 def register(request):
@@ -19,7 +21,7 @@ def register(request):
             user = form.save(commit=False)
             user.type = form.cleaned_data['type']
             picture_data = form.cleaned_data['picture']
-            default_pic = 'icons/user-profile-icon.png'
+            default_pic = str(BASE_DIR) + '/icons/user-profile-icon.png'
             if picture_data is not None:
                 user.picture_data = picture_data.file.read()
             else:
