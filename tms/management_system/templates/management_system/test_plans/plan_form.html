@@ -20,7 +20,6 @@
 		var formValid = !!myform.status.value && !!myform.desc.value && !!myform.name.value;
 		if (!formValid) {
 			alert("Fill all fields!");
-			bootstrap.Modal.getInstance('#saveModal').hide()
 			return;
 		}
 		var tree = $('#tree');
@@ -406,7 +405,7 @@
 				</div>
 				<table id="tree"></table>
 				<button class="btn btn-success" type="button" data-bs-toggle="modal" data-bs-target="#saveModal">Save</button>
-				<div class="modal fade" id="addProjectModal" tabindex="-1" aria-labelledby="addProjectModalLabel" aria-hidden="true">
+				<div class="modal" id="addProjectModal" tabindex="-1" aria-labelledby="addProjectModalLabel" aria-hidden="true">
 					<div class="modal-dialog">
 						<div class="modal-content">
 							<div class="modal-header">
@@ -423,7 +422,7 @@
 						</div>
 					</div>
 				</div>
-				<div class="modal fade" id="addSuitModal" tabindex="-1" aria-labelledby="addSuitModalLabel" aria-hidden="true">
+				<div class="modal" id="addSuitModal" tabindex="-1" aria-labelledby="addSuitModalLabel" aria-hidden="true">
 					<div class="modal-dialog">
 						<div class="modal-content">
 							<div class="modal-header">
@@ -440,7 +439,7 @@
 						</div>
 					</div>
 				</div>
-				<div class="modal fade" id="addCaseModal" tabindex="-1" aria-labelledby="addCaseModalLabel" aria-hidden="true">
+				<div class="modal" id="addCaseModal" tabindex="-1" aria-labelledby="addCaseModalLabel" aria-hidden="true">
 					<div class="modal-dialog">
 						<div class="modal-content">
 							<div class="modal-header">
@@ -457,7 +456,7 @@
 						</div>
 					</div>
 				</div>
-				<div class="modal fade" id="saveModal" tabindex="-1" aria-labelledby="saveModalLabel" aria-hidden="true">
+				<div class="modal" id="saveModal" tabindex="-1" aria-labelledby="saveModalLabel" aria-hidden="true">
 					<div class="modal-dialog">
 						<div class="modal-content">
 							<div class="modal-header">
@@ -466,7 +465,7 @@
 							</div>
 							<div class="modal-footer">
 								<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-								<button type="button" class="btn btn-primary" onclick="submitHandler()">Save changes</button>
+								<button type="button" class="btn btn-primary" data-bs-dismiss="modal" onclick="submitHandler()">Save changes</button>
 							</div>
 						</div>
 					</div>

@@ -35,11 +35,10 @@
 	var submitHandler = function() {
 		var form = document.querySelector("form");
 		var formValid = !!form.status.value && !!form.desc.value && !!form.name.value;
-			if (!formValid) {
-				alert("Fill all fields!");
-				bootstrap.Modal.getInstance('#saveModal').hide()
-				return;
-			}
+		if (!formValid) {
+			alert("Fill all fields!");
+			return;
+		}
 		var textareas = [...document.querySelectorAll("textarea")]
 		.filter(item => item.dataset.hasOwnProperty("index"))
 		.sort((a, b) => a.dataset.index - b.dataset.index)
@@ -232,7 +231,7 @@
 				</form>
 				</form>
 				<button class="btn btn-success" type="button" data-bs-toggle="modal" data-bs-target="#saveModal">Save</button>
-				<div class="modal fade" id="saveModal" tabindex="-1" aria-labelledby="saveModalLabel" aria-hidden="true">
+				<div class="modal" id="saveModal" tabindex="-1" aria-labelledby="saveModalLabel" aria-hidden="true">
 				  <div class="modal-dialog">
 					<div class="modal-content">
 					  <div class="modal-header">
@@ -241,7 +240,7 @@
 					  </div>
 					  <div class="modal-footer">
 						<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-						<button type="button" class="btn btn-primary" onclick="submitHandler()">Save changes</button>
+						<button type="button" class="btn btn-primary" data-bs-dismiss="modal" onclick="submitHandler()">Save changes</button>
 					  </div>
 					</div>
 				  </div>
